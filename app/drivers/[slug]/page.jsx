@@ -7,7 +7,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }) {
-  const driver = getDriver(params.slug)
+  const { slug } = await params
+  const driver = getDriver(slug)
   if (!driver) return {}
   return { title: `${driver.firstName} ${driver.lastName}` }
 }
@@ -17,8 +18,9 @@ const flagEmoji = {
   GER: '🇩🇪', FRA: '🇫🇷', AUT: '🇦🇹', ESP: '🇪🇸',
 }
 
-export default function DriverProfilePage({ params }) {
-  const driver = getDriver(params.slug)
+export default async function DriverProfilePage({ params }) {
+  const { slug } = await params
+  const driver = getDriver(slug)
   if (!driver) notFound()
 
   const { firstName, lastName, nationality, dateOfBirth, number, status, bio, stats, teams, quote } = driver
