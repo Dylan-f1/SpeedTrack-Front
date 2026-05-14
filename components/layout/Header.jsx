@@ -10,10 +10,7 @@ export default function Header() {
         <Link href="/" className="flex-shrink-0 flex items-center gap-2 group">
           <span className="text-xl font-black tracking-tight leading-none">
             SPEED<span className="text-red-primary">TRACK</span>
-          </span>
-          <span className="hidden sm:block h-4 w-px bg-border-light" />
-          <span className="hidden sm:block text-[10px] font-medium text-text-muted uppercase tracking-widest">
-            F1 Data
+            <span className="text-text-muted font-light"> RACING</span>
           </span>
         </Link>
 

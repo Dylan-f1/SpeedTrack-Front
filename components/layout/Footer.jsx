@@ -35,6 +35,7 @@ export default function Footer() {
           <div className="col-span-2 md:col-span-1">
             <span className="text-lg font-black tracking-tight">
               SPEED<span className="text-red-primary">TRACK</span>
+            <span className="text-text-muted font-light"> RACING</span>
             </span>
             <p className="mt-3 text-sm text-text-muted leading-relaxed">
               La référence F1 — pilotes, écuries, circuits et résultats au même endroit.
@@ -63,7 +64,7 @@ export default function Footer() {
         </div>
 
         <div className="pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-text-muted">
-          <span>© {new Date().getFullYear()} SpeedTrack. Contenu gratuit.</span>
+          <span>© {new Date().getFullYear()} SpeedTrack Racing. Contenu gratuit.</span>
           <span>
             F1® est une marque déposée de{' '}
             <span className="text-text-secondary">Formula One Licensing BV</span>

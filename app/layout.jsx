@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: {
-    default: 'SpeedTrack',
-    template: '%s | SpeedTrack',
+    default: 'SpeedTrack Racing',
+    template: '%s | SpeedTrack Racing',
   },
   description:
     'La référence F1 — pilotes, écuries, circuits, saisons et règlements au même endroit.',
