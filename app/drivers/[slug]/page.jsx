@@ -1,14 +1,17 @@
 import { notFound } from 'next/navigation'
-import { getDriver, drivers } from '@/lib/fixtures/drivers'
 import { formatDate } from '@/lib/utils'
 
-export async function generateStaticParams() {
-  return drivers.map((d) => ({ slug: d.slug }))
+async function getDriver(slug) {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/drivers/${slug}`, {
+    cache: 'no-store',
+  })
+  if (!res.ok) return null
+  return res.json()
 }
 
 export async function generateMetadata({ params }) {
   const { slug } = await params
-  const driver = getDriver(slug)
+  const driver = await getDriver(slug)
   if (!driver) return {}
   return { title: `${driver.firstName} ${driver.lastName}` }
 }

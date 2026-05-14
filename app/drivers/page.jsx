@@ -1,12 +1,21 @@
 import DriversGrid from '@/components/drivers/DriversGrid'
-import { drivers } from '@/lib/fixtures/drivers'
 
 export const metadata = {
   title: 'Pilotes',
-  description: 'L\'annuaire complet des pilotes F1 — actifs et légendes.',
+  description: "L'annuaire complet des pilotes F1 — actifs et légendes.",
 }
 
-export default function DriversPage() {
+async function getDrivers() {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/drivers`, {
+    cache: 'no-store',
+  })
+  if (!res.ok) return []
+  return res.json()
+}
+
+export default async function DriversPage() {
+  const drivers = await getDrivers()
+
   return (
     <div className="max-w-screen-xl mx-auto px-6 py-10">
 
