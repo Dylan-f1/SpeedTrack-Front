@@ -23,10 +23,16 @@ const flagEmoji = {
 
 export default async function DriverProfilePage({ params }) {
   const { slug } = await params
-  const driver = getDriver(slug)
+  const driver = await getDriver(slug)
   if (!driver) notFound()
 
-  const { firstName, lastName, nationality, dateOfBirth, number, status, bio, stats, teams, quote } = driver
+  const {
+    firstName, lastName, nationality, dateOfBirth,
+    currentNumber, status, bio,
+    careerStats = {},
+    teams = [],
+    quote,
+  } = driver
 
   return (
     <div>
@@ -57,14 +63,16 @@ export default async function DriverProfilePage({ params }) {
             <span className="w-px h-4 bg-border" />
             <span>{formatDate(dateOfBirth)}</span>
             <span className="w-px h-4 bg-border" />
-            <span>#{number}</span>
+            {currentNumber && <span>#{currentNumber}</span>}
           </div>
         </div>
 
         {/* Numéro watermark côté droit */}
-        <span className="absolute right-8 bottom-4 text-[180px] font-black text-white/[0.04] leading-none select-none">
-          {number}
-        </span>
+        {currentNumber && (
+          <span className="absolute right-8 bottom-4 text-[180px] font-black text-white/[0.04] leading-none select-none">
+            {currentNumber}
+          </span>
+        )}
       </section>
 
       {/* Stats bar */}
@@ -72,11 +80,11 @@ export default async function DriverProfilePage({ params }) {
         <div className="max-w-screen-xl mx-auto px-6">
           <div className="grid grid-cols-5 divide-x divide-border-light">
             {[
-              { label: 'Courses', value: stats.races },
-              { label: 'Victoires', value: stats.wins },
-              { label: 'Podiums', value: stats.podiums },
-              { label: 'Poles', value: stats.poles },
-              { label: 'Titres', value: stats.championships },
+              { label: 'Courses', value: careerStats.races ?? 0 },
+              { label: 'Victoires', value: careerStats.wins ?? 0 },
+              { label: 'Podiums', value: careerStats.podiums ?? 0 },
+              { label: 'Poles', value: careerStats.poles ?? 0 },
+              { label: 'Titres', value: careerStats.championships ?? 0 },
             ].map((s) => (
               <div key={s.label} className="px-6 py-6 text-center">
                 <p className="text-3xl font-black text-text-primary">{s.value}</p>
