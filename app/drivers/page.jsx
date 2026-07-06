@@ -10,7 +10,8 @@ async function getDrivers() {
     cache: 'no-store',
   })
   if (!res.ok) return []
-  return res.json()
+  const json = await res.json()
+  return json.data ?? []
 }
 
 export default async function DriversPage() {

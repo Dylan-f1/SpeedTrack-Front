@@ -7,6 +7,7 @@ const flagEmoji = {
 
 export default function DriverCard({ driver }) {
   const { slug, firstName, lastName, nationality, currentNumber, status, currentTeam } = driver
+  const statusLabel = status === 'champion' ? 'Champion du monde' : status === 'former' ? 'Ancien pilote' : null
 
   return (
     <Link href={`/drivers/${slug}`} className="group block">
@@ -20,10 +21,12 @@ export default function DriverCard({ driver }) {
           {currentNumber ?? '—'}
         </span>
 
-        {/* Badge légende */}
-        {status === 'legend' && (
-          <span className="absolute top-3 left-3 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest bg-red-primary text-white">
-            Légende
+        {/* Badge statut */}
+        {statusLabel && (
+          <span className={`absolute top-3 left-3 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-white ${
+            status === 'champion' ? 'bg-amber-500' : 'bg-red-primary'
+          }`}>
+            {statusLabel}
           </span>
         )}
 

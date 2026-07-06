@@ -5,7 +5,8 @@ import { useState } from 'react'
 const tabs = [
   { key: 'all', label: 'Tous' },
   { key: 'active', label: 'Actifs' },
-  { key: 'legend', label: 'Légendes' },
+  { key: 'former', label: 'Anciens pilotes' },
+  { key: 'champion', label: 'Champions du monde' },
 ]
 
 export default function DriversFilter({ onFilterChange }) {

@@ -46,8 +46,10 @@ export default async function DriverProfilePage({ params }) {
 
         <div className="relative max-w-screen-xl mx-auto px-6 pb-12 w-full">
           {/* Badge statut */}
-          <span className="inline-block px-3 py-1 text-[10px] font-bold uppercase tracking-widest bg-red-primary text-white mb-4">
-            {status === 'legend' ? 'Légende' : 'Actif'}
+          <span className={`inline-block px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white mb-4 ${
+            status === 'champion' ? 'bg-amber-500' : 'bg-red-primary'
+          }`}>
+            {status === 'champion' ? 'Champion du monde' : status === 'former' ? 'Ancien pilote' : 'Actif'}
           </span>
 
           {/* Nom */}
