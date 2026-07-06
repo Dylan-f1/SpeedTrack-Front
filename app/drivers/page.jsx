@@ -1,21 +1,29 @@
 import DriversGrid from '@/components/drivers/DriversGrid'
+import Pagination from '@/components/ui/Pagination'
 
 export const metadata = {
   title: 'Pilotes',
   description: "L'annuaire complet des pilotes F1 — actifs et légendes.",
 }
 
-async function getDrivers() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/drivers`, {
+const DRIVERS_PER_PAGE = 24
+
+async function getDrivers({ page, status }) {
+  const params = new URLSearchParams({ page: String(page), limit: String(DRIVERS_PER_PAGE) })
+  if (status && status !== 'all') params.set('status', status)
+
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/drivers?${params.toString()}`, {
     cache: 'no-store',
   })
-  if (!res.ok) return []
-  const json = await res.json()
-  return json.data ?? []
+  if (!res.ok) return { data: [], total: 0, totalPages: 0 }
+  return res.json()
 }
 
-export default async function DriversPage() {
-  const drivers = await getDrivers()
+export default async function DriversPage({ searchParams }) {
+  const { page: pageParam, status } = await searchParams
+  const page = Math.max(1, Number(pageParam) || 1)
+
+  const { data: drivers, total, totalPages } = await getDrivers({ page, status })
 
   return (
     <div className="max-w-screen-xl mx-auto px-6 py-10">
@@ -33,7 +41,14 @@ export default async function DriversPage() {
         </p>
       </div>
 
-      <DriversGrid drivers={drivers} />
+      <DriversGrid drivers={drivers} total={total} activeStatus={status ?? 'all'} />
+
+      <Pagination
+        basePath="/drivers"
+        searchParams={status && status !== 'all' ? { status } : {}}
+        page={page}
+        totalPages={totalPages}
+      />
     </div>
   )
 }

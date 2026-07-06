@@ -1,6 +1,4 @@
-'use client'
-
-import { useState } from 'react'
+import Link from 'next/link'
 
 const tabs = [
   { key: 'all', label: 'Tous' },
@@ -9,30 +7,25 @@ const tabs = [
   { key: 'champion', label: 'Champions du monde' },
 ]
 
-export default function DriversFilter({ onFilterChange }) {
-  const [active, setActive] = useState('all')
-
-  function handleTab(key) {
-    setActive(key)
-    onFilterChange(key)
-  }
-
+// activeStatus vient de l'URL (?status=...) : le filtre est appliqué côté API, pas en mémoire,
+// pour rester correct sur l'ensemble des pilotes et pas seulement la page affichée
+export default function DriversFilter({ activeStatus = 'all' }) {
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-1 flex-wrap">
       {tabs.map((t) => (
-        <button
+        <Link
           key={t.key}
-          onClick={() => handleTab(t.key)}
+          href={t.key === 'all' ? '/drivers' : `/drivers?status=${t.key}`}
           className={`
             px-4 py-1.5 text-xs font-semibold uppercase tracking-widest transition-colors
-            ${active === t.key
+            ${activeStatus === t.key
               ? 'bg-red-primary text-white'
               : 'bg-surface-elevated text-text-muted border-l-2 border-red-dark hover:text-text-secondary'
             }
           `}
         >
           {t.label}
-        </button>
+        </Link>
       ))}
     </div>
   )
