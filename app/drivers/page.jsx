@@ -8,9 +8,10 @@ export const metadata = {
 
 const DRIVERS_PER_PAGE = 24
 
-async function getDrivers({ page, status }) {
+async function getDrivers({ page, status, search }) {
   const params = new URLSearchParams({ page: String(page), limit: String(DRIVERS_PER_PAGE) })
   if (status && status !== 'all') params.set('status', status)
+  if (search) params.set('search', search)
 
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/drivers?${params.toString()}`, {
     cache: 'no-store',
@@ -20,10 +21,10 @@ async function getDrivers({ page, status }) {
 }
 
 export default async function DriversPage({ searchParams }) {
-  const { page: pageParam, status } = await searchParams
+  const { page: pageParam, status, search } = await searchParams
   const page = Math.max(1, Number(pageParam) || 1)
 
-  const { data: drivers, total, totalPages } = await getDrivers({ page, status })
+  const { data: drivers, total, totalPages } = await getDrivers({ page, status, search })
 
   return (
     <div className="max-w-screen-xl mx-auto px-6 py-10">
@@ -41,11 +42,19 @@ export default async function DriversPage({ searchParams }) {
         </p>
       </div>
 
-      <DriversGrid drivers={drivers} total={total} activeStatus={status ?? 'all'} />
+      <DriversGrid
+        drivers={drivers}
+        total={total}
+        activeStatus={status ?? 'all'}
+        activeSearch={search ?? ''}
+      />
 
       <Pagination
         basePath="/drivers"
-        searchParams={status && status !== 'all' ? { status } : {}}
+        searchParams={{
+          ...(status && status !== 'all' ? { status } : {}),
+          ...(search ? { search } : {}),
+        }}
         page={page}
         totalPages={totalPages}
       />

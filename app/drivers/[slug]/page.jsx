@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { formatDate } from '@/lib/utils'
 
@@ -32,14 +33,31 @@ export default async function DriverProfilePage({ params }) {
     careerStats = {},
     teams = [],
     quote,
+    imageUrl, imageCredit,
+    careerNarrative,
   } = driver
 
   return (
     <div>
       {/* Hero */}
       <section className="relative h-[480px] bg-[#0E0E0E] overflow-hidden flex items-end">
-        {/* Placeholder photo — à remplacer par <Image> quand les assets arrivent */}
+        {imageUrl && (
+          <Image
+            src={imageUrl}
+            alt={`${firstName} ${lastName}`}
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-top"
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/60 to-transparent" />
+
+        {imageCredit && (
+          <span className="absolute bottom-2 right-4 text-[10px] text-text-muted/60">
+            Photo : {imageCredit} (CC)
+          </span>
+        )}
 
         {/* Barre rouge verticale gauche */}
         <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-primary" />
@@ -112,16 +130,19 @@ export default async function DriverProfilePage({ params }) {
           {/* Quote */}
           {quote && (
             <blockquote className="border-l-2 border-red-primary pl-6 py-2">
-              <p className="text-lg italic text-text-secondary leading-relaxed">"{quote}"</p>
+              <p className="text-lg italic text-text-secondary leading-relaxed">&ldquo;{quote}&rdquo;</p>
             </blockquote>
           )}
         </div>
 
         {/* Timeline écuries */}
         <div>
-          <h2 className="text-xs font-semibold text-red-primary uppercase tracking-widest mb-6">
+          <h2 className="text-xs font-semibold text-red-primary uppercase tracking-widest mb-4">
             Équipes
           </h2>
+          {careerNarrative && (
+            <p className="text-sm text-text-secondary leading-relaxed mb-6">{careerNarrative}</p>
+          )}
           <ol className="relative border-l border-border ml-2 space-y-6">
             {teams.map((t, i) => (
               <li key={i} className="pl-6">

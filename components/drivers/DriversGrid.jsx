@@ -1,12 +1,16 @@
 import DriverCard from './DriverCard'
 import DriversFilter from './DriversFilter'
+import DriversSearch from './DriversSearch'
 
-export default function DriversGrid({ drivers, total, activeStatus }) {
+export default function DriversGrid({ drivers, total, activeStatus, activeSearch }) {
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
-        <DriversFilter activeStatus={activeStatus} />
-        <span className="text-xs text-text-muted">
+      <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
+        <div className="flex items-center gap-4 flex-wrap">
+          <DriversFilter activeStatus={activeStatus} />
+          <DriversSearch defaultValue={activeSearch} status={activeStatus} />
+        </div>
+        <span className="text-xs text-text-muted whitespace-nowrap">
           {total} pilote{total > 1 ? 's' : ''}
         </span>
       </div>

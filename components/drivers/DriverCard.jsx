@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 
 const flagEmoji = {
@@ -6,15 +7,24 @@ const flagEmoji = {
 }
 
 export default function DriverCard({ driver }) {
-  const { slug, firstName, lastName, nationality, currentNumber, status, currentTeam } = driver
+  const { slug, firstName, lastName, nationality, currentNumber, status, currentTeam, imageUrl } = driver
   const statusLabel = status === 'champion' ? 'Champion du monde' : status === 'former' ? 'Ancien pilote' : null
 
   return (
     <Link href={`/drivers/${slug}`} className="group block">
       <div className="relative overflow-hidden bg-surface aspect-[3/4] rounded-sm">
 
-        {/* Placeholder photo */}
-        <div className="absolute inset-0 bg-gradient-to-br from-surface-elevated to-background" />
+        {imageUrl ? (
+          <Image
+            src={imageUrl}
+            alt={`${firstName} ${lastName}`}
+            fill
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            className="object-cover"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-surface-elevated to-background" />
+        )}
 
         {/* Numero watermark */}
         <span className="absolute top-3 right-4 text-6xl font-black text-white/5 leading-none select-none">

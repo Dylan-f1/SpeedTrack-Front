@@ -23,7 +23,7 @@ export default function Header() {
         <div className="flex items-center gap-3">
           <span className="flex items-center gap-1.5 text-xs font-medium text-text-muted">
             <span className="w-1.5 h-1.5 rounded-full bg-red-primary animate-pulse" />
-            2025
+            2026
           </span>
         </div>
 
