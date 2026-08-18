@@ -127,6 +127,16 @@ export default async function DriverProfilePage({ params }) {
             <p className="text-text-secondary leading-relaxed">{bio}</p>
           </div>
 
+          {/* Récit de parcours */}
+          {careerNarrative && (
+            <div>
+              <h2 className="text-xs font-semibold text-red-primary uppercase tracking-widest mb-4">
+                Parcours
+              </h2>
+              <p className="text-text-secondary leading-relaxed">{careerNarrative}</p>
+            </div>
+          )}
+
           {/* Quote */}
           {quote && (
             <blockquote className="border-l-2 border-red-primary pl-6 py-2">
@@ -137,12 +147,9 @@ export default async function DriverProfilePage({ params }) {
 
         {/* Timeline écuries */}
         <div>
-          <h2 className="text-xs font-semibold text-red-primary uppercase tracking-widest mb-4">
+          <h2 className="text-xs font-semibold text-red-primary uppercase tracking-widest mb-6">
             Équipes
           </h2>
-          {careerNarrative && (
-            <p className="text-sm text-text-secondary leading-relaxed mb-6">{careerNarrative}</p>
-          )}
           <ol className="relative border-l border-border ml-2 space-y-6">
             {teams.map((t, i) => (
               <li key={i} className="pl-6">

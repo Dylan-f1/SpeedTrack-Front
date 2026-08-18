@@ -3,15 +3,30 @@
 // être perdu lors d'une recherche.
 export default function DriversSearch({ defaultValue = '', status }) {
   return (
-    <form action="/drivers" method="GET" className="w-full max-w-xs">
+    <form action="/drivers" method="GET" className="relative w-full">
       {status && status !== 'all' && <input type="hidden" name="status" value={status} />}
+
+      <svg
+        className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <circle cx="11" cy="11" r="7" />
+        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+      </svg>
+
       <input
         type="search"
         name="search"
         defaultValue={defaultValue}
-        placeholder="Rechercher un pilote..."
+        placeholder="Rechercher un pilote par nom..."
         aria-label="Rechercher un pilote"
-        className="w-full bg-surface-elevated text-text-primary text-sm placeholder:text-text-muted px-4 py-2 border-l-2 border-red-dark focus:outline-none focus:border-red-primary"
+        className="w-full bg-surface-elevated text-text-primary text-sm placeholder:text-text-muted pl-11 pr-4 py-3 rounded-sm border border-border-light focus:outline-none focus:border-red-primary transition-colors"
       />
     </form>
   )

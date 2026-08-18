@@ -5,11 +5,12 @@ import DriversSearch from './DriversSearch'
 export default function DriversGrid({ drivers, total, activeStatus, activeSearch }) {
   return (
     <div>
+      <div className="mb-6 max-w-md">
+        <DriversSearch defaultValue={activeSearch} status={activeStatus} />
+      </div>
+
       <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
-        <div className="flex items-center gap-4 flex-wrap">
-          <DriversFilter activeStatus={activeStatus} />
-          <DriversSearch defaultValue={activeSearch} status={activeStatus} />
-        </div>
+        <DriversFilter activeStatus={activeStatus} />
         <span className="text-xs text-text-muted whitespace-nowrap">
           {total} pilote{total > 1 ? 's' : ''}
         </span>
