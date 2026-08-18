@@ -59,7 +59,7 @@ export default function HomePage() {
             Speed<span className="text-red-primary">Track</span>
           </h1>
           <p className="text-text-muted text-lg max-w-xl leading-relaxed">
-            Pilotes, écuries, circuits, saisons et règlements — toute l'histoire de la Formule 1 en un seul endroit.
+            Pilotes, écuries, circuits, saisons et règlements — toute l&apos;histoire de la Formule 1 en un seul endroit.
           </p>
           <div className="flex flex-wrap gap-3 mt-8">
             <Link

@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { formatDate, formatLapTime, getCountryFlag } from '@/lib/utils'
 
 async function fetchRaceData(year, round) {
-  const base = process.env.NEXT_PUBLIC_API_URL
+  const base = process.env.API_URL
 
   const [raceRes, qualifyingRes] = await Promise.all([
     fetch(`${base}/races/${year}/${round}`, { cache: 'no-store' }),

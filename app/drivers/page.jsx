@@ -13,7 +13,7 @@ async function getDrivers({ page, status, search }) {
   if (status && status !== 'all') params.set('status', status)
   if (search) params.set('search', search)
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/drivers?${params.toString()}`, {
+  const res = await fetch(`${process.env.API_URL}/drivers?${params.toString()}`, {
     cache: 'no-store',
   })
   if (!res.ok) return { data: [], total: 0, totalPages: 0 }

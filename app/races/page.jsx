@@ -7,7 +7,7 @@ export const metadata = {
 }
 
 async function getLatestSeasonRaces() {
-  const base = process.env.NEXT_PUBLIC_API_URL
+  const base = process.env.API_URL
 
   // Récupère la saison la plus récente
   const seasonsRes = await fetch(`${base}/seasons?limit=1`, { cache: 'no-store' })

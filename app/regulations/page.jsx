@@ -6,7 +6,7 @@ export const metadata = {
 }
 
 async function getRegulations() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/regulations`, {
+  const res = await fetch(`${process.env.API_URL}/regulations`, {
     cache: 'no-store',
   })
   if (!res.ok) return []
@@ -28,7 +28,7 @@ export default async function RegulationsPage() {
           Règlements
         </h1>
         <p className="text-text-muted text-sm max-w-xl">
-          Chaque ère réglementaire a redefini la Formule 1. Des turbo aux hybrides, l'histoire technique du sport.
+          Chaque ère réglementaire a redefini la Formule 1. Des turbo aux hybrides, l&apos;histoire technique du sport.
         </p>
       </div>
 
