@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import { getCountryFlag } from '@/lib/utils'
 
 async function getTeam(slug) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/teams/${slug}`, {
+  const res = await fetch(`${process.env.API_URL}/teams/${slug}`, {
     cache: 'no-store',
   })
   if (!res.ok) return null

@@ -6,7 +6,7 @@ export const metadata = {
 }
 
 async function getTeams() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/teams?limit=50`, {
+  const res = await fetch(`${process.env.API_URL}/teams?limit=50`, {
     cache: 'no-store',
   })
   if (!res.ok) return []

@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { formatDate, getCountryFlag } from '@/lib/utils'
 
 async function fetchAll(year) {
-  const base = process.env.NEXT_PUBLIC_API_URL
+  const base = process.env.API_URL
 
   const [seasonRes, driverStandingsRes, constructorStandingsRes, racesRes] = await Promise.all([
     fetch(`${base}/seasons/${year}`, { cache: 'no-store' }),

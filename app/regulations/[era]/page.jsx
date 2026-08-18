@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 async function getRegulation(era) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/regulations/${era}`, {
+  const res = await fetch(`${process.env.API_URL}/regulations/${era}`, {
     cache: 'no-store',
   })
   if (!res.ok) return null

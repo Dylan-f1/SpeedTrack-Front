@@ -6,7 +6,7 @@ export const metadata = {
 }
 
 async function getSeasons() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/seasons?limit=100`, {
+  const res = await fetch(`${process.env.API_URL}/seasons?limit=100`, {
     cache: 'no-store',
   })
   if (!res.ok) return []
@@ -28,7 +28,7 @@ export default async function SeasonsPage() {
           Saisons
         </h1>
         <p className="text-text-muted text-sm max-w-xl">
-          Chaque saison, une nouvelle bataille pour le titre. Retracez l'histoire du championnat.
+          Chaque saison, une nouvelle bataille pour le titre. Retracez l&apos;histoire du championnat.
         </p>
       </div>
 

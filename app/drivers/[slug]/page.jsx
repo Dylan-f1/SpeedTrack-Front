@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { formatDate } from '@/lib/utils'
 
 async function getDriver(slug) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/drivers/${slug}`, {
+  const res = await fetch(`${process.env.API_URL}/drivers/${slug}`, {
     cache: 'no-store',
   })
   if (!res.ok) return null

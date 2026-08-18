@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { getCountryFlag, formatLapTime } from '@/lib/utils'
 
 async function getCircuit(slug) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/circuits/${slug}`, {
+  const res = await fetch(`${process.env.API_URL}/circuits/${slug}`, {
     cache: 'no-store',
   })
   if (!res.ok) return null
