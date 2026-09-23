@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { getCountryFlag } from '@/lib/utils'
+import { Flag } from '@/components/ui/Flag'
 
 const FALLBACK_COLOR = '#8A8A8A'
 
@@ -37,7 +37,7 @@ export default function TeamCard({ team }) {
 
         <div className="relative">
           <p className="text-[11px] text-text-muted uppercase tracking-widest mb-3">
-            {getCountryFlag(nationality)} {nationality}
+            <Flag code={nationality} /> {nationality}
           </p>
           <h3 className="text-lg font-black uppercase tracking-tight text-text-primary leading-tight">
             {name}

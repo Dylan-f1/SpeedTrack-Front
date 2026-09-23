@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { formatDate, getCountryFlag } from '@/lib/utils'
+import { formatDate } from '@/lib/utils'
+import { Flag } from '@/components/ui/Flag'
 
 export const metadata = {
   title: 'Résultats',
@@ -71,7 +72,7 @@ export default async function RacesPage() {
                 </p>
                 <p className="text-xs text-text-muted mt-0.5 flex items-center gap-2">
                   {race.circuit && (
-                    <span>{getCountryFlag(race.circuit.country)} {race.circuit.name}</span>
+                    <span><Flag code={race.circuit.country} /> {race.circuit.name}</span>
                   )}
                 </p>
               </div>

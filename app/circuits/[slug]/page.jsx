@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getCountryFlag, formatLapTime } from '@/lib/utils'
+import { formatLapTime } from '@/lib/utils'
+import { Flag } from '@/components/ui/Flag'
 
 async function getCircuit(slug) {
   const res = await fetch(`${process.env.API_URL}/circuits/${slug}`, {
@@ -42,7 +43,7 @@ export default async function CircuitProfilePage({ params }) {
           </Link>
 
           <p className="text-[11px] text-text-muted uppercase tracking-widest mb-3">
-            {getCountryFlag(country)} {country}
+            <Flag code={country} /> {country}
           </p>
           <h1 className="text-5xl md:text-6xl font-black uppercase tracking-tight leading-none mb-3">
             {name}
