@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { formatDate, getCountryFlag } from '@/lib/utils'
+import { formatDate } from '@/lib/utils'
+import { Flag } from '@/components/ui/Flag'
 
 async function fetchAll(year) {
   const base = process.env.API_URL
@@ -172,7 +173,7 @@ export default async function SeasonPage({ params }) {
                   </p>
                   <p className="text-[11px] text-text-muted mt-0.5 flex items-center gap-1">
                     {race.circuit && (
-                      <span>{getCountryFlag(race.circuit.country)} {race.circuit.country}</span>
+                      <span><Flag code={race.circuit.country} /> {race.circuit.country}</span>
                     )}
                     {race.raceDate && (
                       <>

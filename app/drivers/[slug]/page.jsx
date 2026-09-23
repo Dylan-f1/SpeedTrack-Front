@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { formatDate } from '@/lib/utils'
+import { Flag } from '@/components/ui/Flag'
 
 async function getDriver(slug) {
   const res = await fetch(`${process.env.API_URL}/drivers/${slug}`, {
@@ -15,11 +16,6 @@ export async function generateMetadata({ params }) {
   const driver = await getDriver(slug)
   if (!driver) return {}
   return { title: `${driver.firstName} ${driver.lastName}` }
-}
-
-const flagEmoji = {
-  GBR: '🇬🇧', NED: '🇳🇱', MON: '🇲🇨', BRA: '🇧🇷',
-  GER: '🇩🇪', FRA: '🇫🇷', AUT: '🇦🇹', ESP: '🇪🇸',
 }
 
 export default async function DriverProfilePage({ params }) {
@@ -79,7 +75,7 @@ export default async function DriverProfilePage({ params }) {
 
           {/* Meta */}
           <div className="flex items-center gap-4 mt-4 text-sm text-text-muted">
-            <span>{flagEmoji[nationality] ?? '🏁'} {nationality}</span>
+            <span><Flag code={nationality} /> {nationality}</span>
             <span className="w-px h-4 bg-border" />
             <span>{formatDate(dateOfBirth)}</span>
             <span className="w-px h-4 bg-border" />

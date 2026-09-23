@@ -1,10 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-
-const flagEmoji = {
-  GBR: '🇬🇧', NED: '🇳🇱', MON: '🇲🇨', BRA: '🇧🇷',
-  GER: '🇩🇪', FRA: '🇫🇷', AUT: '🇦🇹', ESP: '🇪🇸',
-}
+import { Flag } from '@/components/ui/Flag'
 
 export default function DriverCard({ driver }) {
   const { slug, firstName, lastName, nationality, currentNumber, status, currentTeam, imageUrl } = driver
@@ -43,7 +39,7 @@ export default function DriverCard({ driver }) {
         {/* Infos bottom */}
         <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/90 via-black/50 to-transparent">
           <p className="text-[11px] text-text-muted mb-1">
-            {flagEmoji[nationality] ?? '🏁'} {currentTeam?.name ?? 'Retraité'}
+            <Flag code={nationality} /> {currentTeam?.name ?? 'Retraité'}
           </p>
           <p className="text-base font-bold text-text-primary leading-tight">
             {firstName}{' '}

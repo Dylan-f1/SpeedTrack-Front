@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { formatDate, formatLapTime, getCountryFlag } from '@/lib/utils'
+import { formatDate, formatLapTime } from '@/lib/utils'
+import { Flag } from '@/components/ui/Flag'
 
 async function fetchRaceData(year, round) {
   const base = process.env.API_URL
@@ -51,7 +52,7 @@ export default async function RaceResultPage({ params }) {
               <p className="text-[11px] text-text-muted uppercase tracking-widest mb-2">
                 Round {round} · {year}
                 {grandPrix?.circuit && (
-                  <> · {getCountryFlag(grandPrix.circuit.country)} {grandPrix.circuit.country}</>
+                  <> · <Flag code={grandPrix.circuit.country} /> {grandPrix.circuit.country}</>
                 )}
               </p>
               <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tight leading-none">

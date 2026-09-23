@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getCountryFlag } from '@/lib/utils'
+import { Flag } from '@/components/ui/Flag'
 
 async function getTeam(slug) {
   const res = await fetch(`${process.env.API_URL}/teams/${slug}`, {
@@ -33,9 +33,13 @@ export default async function TeamProfilePage({ params }) {
     base,
     primaryColor,
     logoUrl,
+    description,
     heritageNote,
+    principals = [],
+    notablePeople = [],
     lineage = [],
     currentDrivers = [],
+    driversByYear = [],
     season: seasonYear,
   } = team
 
@@ -75,7 +79,7 @@ export default async function TeamProfilePage({ params }) {
           <div className="flex items-start gap-8">
             <div className="flex-1">
               <p className="text-[11px] text-text-muted uppercase tracking-widest mb-3">
-                {getCountryFlag(nationality)} {nationality}
+                <Flag code={nationality} /> {nationality}
               </p>
               <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tight leading-none mb-6">
                 {fullName ?? name}
@@ -98,6 +102,16 @@ export default async function TeamProfilePage({ params }) {
       <div className="max-w-screen-xl mx-auto px-6 py-12 grid grid-cols-1 lg:grid-cols-3 gap-12">
 
         <div className="lg:col-span-2 space-y-10">
+          {/* Description générale */}
+          {description && (
+            <div>
+              <h2 className="text-xs font-semibold text-red-primary uppercase tracking-widest mb-4">
+                Histoire
+              </h2>
+              <p className="text-text-secondary leading-relaxed">{description}</p>
+            </div>
+          )}
+
           {/* Récit d'héritage */}
           {heritageNote && (
             <div>
@@ -105,6 +119,43 @@ export default async function TeamProfilePage({ params }) {
                 Héritage
               </h2>
               <p className="text-text-secondary leading-relaxed">{heritageNote}</p>
+            </div>
+          )}
+
+          {/* Team principals */}
+          {principals.length > 0 && (
+            <div>
+              <h2 className="text-xs font-semibold text-red-primary uppercase tracking-widest mb-4">
+                Team principals
+              </h2>
+              <ul className="space-y-2">
+                {principals.map((p, i) => (
+                  <li key={i} className="flex items-baseline justify-between text-sm border-b border-border-light pb-2">
+                    <span className="text-text-primary font-semibold">{p.name}</span>
+                    <span className="text-text-muted text-xs">{p.from} — {p.to ?? 'présent'}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Personnalités marquantes */}
+          {notablePeople.length > 0 && (
+            <div>
+              <h2 className="text-xs font-semibold text-red-primary uppercase tracking-widest mb-4">
+                Personnalités marquantes
+              </h2>
+              <ul className="space-y-2">
+                {notablePeople.map((p, i) => (
+                  <li key={i} className="flex items-baseline justify-between text-sm border-b border-border-light pb-2">
+                    <span>
+                      <span className="text-text-primary font-semibold">{p.name}</span>
+                      <span className="text-text-muted"> — {p.role}</span>
+                    </span>
+                    <span className="text-text-muted text-xs whitespace-nowrap ml-4">{p.from} — {p.to ?? 'présent'}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
 
@@ -129,7 +180,7 @@ export default async function TeamProfilePage({ params }) {
                         {driver.firstName} {driver.lastName}
                       </p>
                       <p className="text-xs text-text-muted mt-0.5">
-                        {getCountryFlag(driver.nationality)} {driver.nationality}
+                        <Flag code={driver.nationality} /> {driver.nationality}
                       </p>
                     </div>
                   </Link>
@@ -171,6 +222,32 @@ export default async function TeamProfilePage({ params }) {
           </div>
         )}
       </div>
+
+      {/* Pilotes par année : tout l'historique de l'écurie, pas juste la saison en cours */}
+      {driversByYear.length > 0 && (
+        <div className="max-w-screen-xl mx-auto px-6 pb-16">
+          <h2 className="text-xs font-semibold text-red-primary uppercase tracking-widest mb-6">
+            Pilotes par année
+          </h2>
+          <div className="border-t border-border-light">
+            {driversByYear.map(({ year, drivers }) => (
+              <div key={year} className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-6 py-3 border-b border-border-light">
+                <span className="text-sm font-black text-text-primary w-16 shrink-0">{year}</span>
+                <div className="flex flex-wrap gap-x-2 gap-y-1 text-sm text-text-muted">
+                  {drivers.map((driver, i) => (
+                    <span key={driver.slug}>
+                      <Link href={`/drivers/${driver.slug}`} className="hover:text-red-primary transition-colors">
+                        {driver.firstName} {driver.lastName}
+                      </Link>
+                      {i < drivers.length - 1 && <span>,</span>}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
