@@ -1,67 +1,232 @@
-import Link from 'next/link'
+import Breadcrumb from '@/components/ui/Breadcrumb'
+import { regulationsAPI } from '@/lib/api'
+import {
+  ERA_2026_CATEGORY,
+  ERA_2026_PILLARS,
+  FAQ_CATEGORY,
+  FAQ_ITEMS,
+  POINTS_CATEGORY,
+  POINTS_MAIN,
+  POINTS_SPRINT,
+  QUICK_METRICS,
+  RACE_FLAGS,
+  RACE_FLAGS_CATEGORY,
+  REGULATION_FILTERS,
+  REGULATION_PILLARS,
+} from '@/lib/content/regulations'
+import {
+  ERA_2026_SEARCH_INDEX,
+  FAQ_SEARCH_INDEX,
+  PILLAR_SEARCH_INDEXES,
+  POINTS_SEARCH_INDEX,
+  RACE_FLAGS_SEARCH_INDEX,
+  REGULATION_SEARCH_UNITS,
+} from '@/components/regulations/regulationsSearchIndex'
+import RegulationsExplorer from '@/components/regulations/RegulationsExplorer'
+import SearchFilterBar from '@/components/regulations/SearchFilterBar'
+import FilterableSection from '@/components/regulations/FilterableSection'
+import RegulationsSectionHeader from '@/components/regulations/RegulationsSectionHeader'
+import PillarCard from '@/components/regulations/PillarCard'
+import RaceFlagCard from '@/components/regulations/RaceFlagCard'
+import PointsTable from '@/components/regulations/PointsTable'
+import Era2026Card from '@/components/regulations/Era2026Card'
+import FaqAccordion from '@/components/regulations/FaqAccordion'
+import RegulationErasSection from '@/components/regulations/RegulationErasSection'
 
 export const metadata = {
   title: 'Règlements',
-  description: "Les grandes ères réglementaires de la Formule 1 — moteurs, châssis et règles.",
+  description:
+    'Les règles sportives, techniques et financières de la Formule 1 en 2026, et ses grandes ères réglementaires.',
 }
 
-async function getRegulations() {
-  const res = await fetch(`${process.env.API_URL}/regulations`, {
-    cache: 'no-store',
-  })
-  if (!res.ok) return []
-  const json = await res.json()
-  return Array.isArray(json) ? json : (json.data ?? [])
+async function fetchRegulationEras() {
+  try {
+    const response = await regulationsAPI.list()
+    const eras = Array.isArray(response) ? response : response?.data
+    return Array.isArray(eras) ? eras : []
+  } catch {
+    return []
+  }
 }
 
 export default async function RegulationsPage() {
-  const regulations = await getRegulations()
+  const regulationEras = await fetchRegulationEras()
 
   return (
-    <div className="max-w-screen-xl mx-auto px-6 py-10">
-
-      <div className="mb-10">
-        <p className="text-xs font-semibold text-red-primary uppercase tracking-widest mb-2">
-          Technique
-        </p>
-        <h1 className="text-4xl font-black uppercase tracking-tight mb-3">
-          Règlements
-        </h1>
-        <p className="text-text-muted text-sm max-w-xl">
-          Chaque ère réglementaire a redefini la Formule 1. Des turbo aux hybrides, l&apos;histoire technique du sport.
-        </p>
+    <div className="flex flex-col w-full">
+      <div className="w-full max-w-7xl mx-auto px-margin-desktop pt-8">
+        <Breadcrumb items={[{ label: 'Règlements' }]} />
       </div>
 
-      {regulations.length === 0 ? (
-        <p className="text-text-muted text-sm py-12 text-center">Aucun règlement trouvé.</p>
-      ) : (
-        <div className="space-y-3">
-          {regulations.map((reg) => (
-            <Link
-              key={reg.era}
-              href={`/regulations/${reg.era}`}
-              className="group flex items-center gap-6 bg-surface border border-border rounded-sm px-6 py-5 hover:border-red-primary transition-colors"
-            >
-              <div className="flex-1 min-w-0">
-                <h3 className="font-black uppercase tracking-tight text-text-primary group-hover:text-red-primary transition-colors">
-                  {reg.label ?? reg.era}
-                </h3>
-                {reg.engineSpec && (
-                  <p className="text-xs text-text-muted mt-1">{reg.engineSpec}</p>
-                )}
-                {reg.summary && (
-                  <p className="text-sm text-text-secondary mt-2 line-clamp-2">{reg.summary}</p>
-                )}
+      <RegulationsExplorer>
+        <section className="w-full px-margin-desktop pt-space-xl pb-space-lg bg-background">
+          <div className="max-w-7xl mx-auto flex flex-col gap-space-md">
+            <div className="flex flex-wrap items-center gap-space-xs">
+              <span className="px-space-sm py-1 bg-surface-container font-sans text-label-caps uppercase tracking-widest text-primary-container font-bold">
+                RÈGLEMENT FIA
+              </span>
+              <span className="text-tertiary-container text-body-sm font-mono">•</span>
+              <span className="font-mono text-telemetry-sm text-on-surface-variant uppercase">
+                SAISON 2026 · RÈGLEMENT EN VIGUEUR
+              </span>
+            </div>
+            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-space-md">
+              <div className="space-y-space-xs">
+                <h1 className="font-sans text-display-lg font-bold text-on-surface uppercase tracking-tight">
+                  Règlements de la <span className="text-primary-container">Formule 1</span>
+                </h1>
+                <p className="font-sans text-body-lg text-tertiary max-w-3xl">
+                  Guide structuré des règles techniques, sportives et financières en vigueur dans le
+                  Championnat du Monde FIA de Formule 1. Clarté, transparence et repères
+                  opérationnels instantanés.
+                </p>
               </div>
-              {reg.seasons?.length > 0 && (
-                <span className="shrink-0 text-xs text-text-muted">
-                  {reg.seasons.length} saison{reg.seasons.length > 1 ? 's' : ''}
+              <div className="flex flex-wrap items-center gap-space-sm bg-surface-container-low p-space-sm">
+                {QUICK_METRICS.map((metric) => (
+                  <div
+                    key={metric.label}
+                    className="px-space-md py-space-xs bg-surface-container flex flex-col"
+                  >
+                    <span className="font-sans text-label-caps font-bold text-on-surface-variant">
+                      {metric.label}
+                    </span>
+                    <span className="font-mono text-telemetry-md text-on-surface font-bold">
+                      {metric.value}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <SearchFilterBar filters={REGULATION_FILTERS} units={REGULATION_SEARCH_UNITS} />
+          </div>
+        </section>
+
+        <div className="w-full px-margin-desktop py-space-xl max-w-7xl mx-auto flex flex-col gap-space-xl">
+          <section className="flex flex-col gap-space-md">
+            <RegulationsSectionHeader
+              eyebrow="STRUCTURE MAJEURE"
+              title="Les Trois Piliers Réglementaires"
+              aside={
+                <span className="font-mono text-telemetry-sm text-tertiary hidden md:inline-block">
+                  LIVRE DE RÈGLES FIA
                 </span>
-              )}
-            </Link>
-          ))}
+              }
+            />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-gutter-desktop">
+              {REGULATION_PILLARS.map((pillar) => (
+                <FilterableSection
+                  key={pillar.id}
+                  as="article"
+                  category={pillar.category}
+                  searchIndex={PILLAR_SEARCH_INDEXES[pillar.id]}
+                  className="bg-surface-container-low flex flex-col p-space-lg hover:bg-surface-container transition-colors"
+                >
+                  <PillarCard pillar={pillar} />
+                </FilterableSection>
+              ))}
+            </div>
+          </section>
+
+          <FilterableSection
+            as="section"
+            category={RACE_FLAGS_CATEGORY}
+            searchIndex={RACE_FLAGS_SEARCH_INDEX}
+            className="flex flex-col gap-space-md"
+          >
+            <RegulationsSectionHeader
+              eyebrow="SIGNAUX VISUELS & COMMISSIONS DE PISTE"
+              title="Drapeaux & Procédures de Course"
+              aside={
+                <span className="font-mono text-telemetry-sm text-on-surface-variant hidden sm:inline-block">
+                  PROTOCOLES DIGITAUX &amp; PHYSIQUES FIA
+                </span>
+              }
+            />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter-desktop">
+              {RACE_FLAGS.map((flag) => (
+                <RaceFlagCard key={flag.code} flag={flag} />
+              ))}
+            </div>
+          </FilterableSection>
+
+          <FilterableSection
+            as="section"
+            category={POINTS_CATEGORY}
+            searchIndex={POINTS_SEARCH_INDEX}
+            className="flex flex-col gap-space-md"
+          >
+            <RegulationsSectionHeader
+              eyebrow="SYSTÈME DE SCORING"
+              title="Barème Officiel des Points"
+              aside={
+                <div className="flex items-center gap-space-xs font-mono text-telemetry-sm text-on-surface-variant">
+                  <span className="material-symbols-outlined text-[16px] text-primary-container">
+                    sports_score
+                  </span>
+                  <span>SAISON 2026</span>
+                </div>
+              }
+            />
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter-desktop">
+              <PointsTable
+                table={POINTS_MAIN}
+                className="lg:col-span-7"
+                gridClassName="grid-cols-2 sm:grid-cols-5"
+              />
+              <PointsTable
+                table={POINTS_SPRINT}
+                className="lg:col-span-5"
+                gridClassName="grid-cols-4"
+              />
+            </div>
+          </FilterableSection>
+
+          <FilterableSection
+            as="section"
+            category={ERA_2026_CATEGORY}
+            searchIndex={ERA_2026_SEARCH_INDEX}
+            className="bg-surface-container-lowest p-space-lg lg:p-space-xl flex flex-col gap-space-lg relative overflow-hidden"
+          >
+            <div className="absolute -right-16 -bottom-16 w-64 h-64 bg-primary-container/5 rounded-full blur-3xl pointer-events-none" />
+            <div className="relative z-10">
+              <RegulationsSectionHeader
+                eyebrow="NOUVELLE ÈRE TECHNIQUE"
+                title="Règlement 2026 en Bref"
+                aside={
+                  <span className="shrink-0 self-start lg:self-auto px-space-md py-space-xs bg-surface-container text-on-surface font-mono text-telemetry-sm uppercase font-bold tracking-wider">
+                    EN VIGUEUR DEPUIS 2026
+                  </span>
+                }
+              >
+                <p className="font-sans text-body-md text-tertiary">
+                  La génération de monoplaces introduite en 2026 rééquilibre la puissance
+                  thermique/électrique et remplace le DRS par une aérodynamique active.
+                </p>
+              </RegulationsSectionHeader>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter-desktop relative z-10">
+              {ERA_2026_PILLARS.map((pillar) => (
+                <Era2026Card key={pillar.title} pillar={pillar} />
+              ))}
+            </div>
+          </FilterableSection>
+
+          <FilterableSection
+            as="section"
+            category={FAQ_CATEGORY}
+            searchIndex={FAQ_SEARCH_INDEX}
+            className="flex flex-col gap-space-md"
+          >
+            <RegulationsSectionHeader
+              eyebrow="CLARIFICATIONS & FAQ"
+              title="Règles Souvent Mal Comprises"
+            />
+            <FaqAccordion items={FAQ_ITEMS} />
+          </FilterableSection>
+
+          {regulationEras.length > 0 && <RegulationErasSection eras={regulationEras} />}
         </div>
-      )}
+      </RegulationsExplorer>
     </div>
   )
 }
