@@ -4,9 +4,18 @@ import { Flag } from '@/components/ui/Flag'
 import { getLogoBackgroundClass } from '@/components/teams/teamLogo'
 
 export default function TeamHeader({ team }) {
-  const { slug, name, fullName, nationality, founded, base, logoUrl, principals = [] } = team
+  const {
+    name,
+    fullName,
+    nationality,
+    founded,
+    base,
+    logoUrl,
+    logoBackground,
+    principals = [],
+  } = team
   const currentPrincipal = principals.find((principal) => principal.to === null)
-  const logoBackground = getLogoBackgroundClass(slug)
+  const logoBackgroundClass = getLogoBackgroundClass(logoBackground)
 
   const facts = [
     base && { label: 'Siège', value: base },
@@ -46,7 +55,7 @@ export default function TeamHeader({ team }) {
 
         {logoUrl && (
           <div
-            className={`relative w-36 h-36 sm:w-44 sm:h-44 shrink-0 self-start lg:self-center rounded-xl z-10 ${logoBackground}`}
+            className={`relative w-36 h-36 sm:w-44 sm:h-44 shrink-0 self-start lg:self-center rounded-xl z-10 ${logoBackgroundClass}`}
           >
             <Image
               src={logoUrl}

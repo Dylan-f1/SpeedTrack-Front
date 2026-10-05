@@ -6,7 +6,7 @@ import { getLogoBackgroundClass } from '@/components/teams/teamLogo'
 const DEFAULT_ACCENT_COLOR = '#e10600'
 
 export default function CurrentTeamCard({ team, drivers }) {
-  const { slug, name, fullName, nationality, base, logoUrl, primaryColor } = team
+  const { slug, name, fullName, nationality, base, logoUrl, logoBackground, primaryColor } = team
   const accentColor = primaryColor ?? DEFAULT_ACCENT_COLOR
 
   return (
@@ -18,7 +18,9 @@ export default function CurrentTeamCard({ team, drivers }) {
 
       <div className="p-5 flex flex-col gap-4 flex-1">
         <div className="flex items-start gap-4">
-          <div className={`relative w-14 h-14 shrink-0 rounded-lg ${getLogoBackgroundClass(slug)}`}>
+          <div
+            className={`relative w-14 h-14 shrink-0 rounded-lg ${getLogoBackgroundClass(logoBackground)}`}
+          >
             {logoUrl ? (
               <Image
                 src={logoUrl}
