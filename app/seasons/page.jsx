@@ -1,64 +1,92 @@
-import Link from 'next/link'
+import Breadcrumb from '@/components/ui/Breadcrumb'
+import SectionHeader from '@/components/ui/SectionHeader'
+import EraTimeline from '@/components/regulations/EraTimeline'
+import SeasonTile from '@/components/seasons/SeasonTile'
+import { findEraForYear, getRegulationEras } from '@/lib/regulations'
+import { getSeasonYears } from '@/lib/seasons'
 
 export const metadata = {
   title: 'Saisons',
-  description: "Toutes les saisons de Formule 1 — champions, résultats et histoire.",
+  description: 'Toutes les saisons du championnat du monde de Formule 1 depuis 1950.',
 }
 
-async function getSeasons() {
-  const res = await fetch(`${process.env.API_URL}/seasons?limit=100`, {
-    cache: 'no-store',
-  })
-  if (!res.ok) return []
-  const json = await res.json()
-  return json.data ?? []
+const DECADE_LENGTH = 10
+
+// Les ères ne sont qu'un repère sur cette page : si elles manquent, la liste reste utilisable
+async function getRegulationErasOrEmpty() {
+  try {
+    return await getRegulationEras()
+  } catch {
+    return []
+  }
+}
+
+function groupByDecade(years) {
+  const yearsByDecade = new Map()
+  for (const year of years) {
+    const decade = Math.floor(year / DECADE_LENGTH) * DECADE_LENGTH
+    yearsByDecade.set(decade, [...(yearsByDecade.get(decade) ?? []), year])
+  }
+  return [...yearsByDecade.entries()].map(([decade, decadeYears]) => ({ decade, decadeYears }))
 }
 
 export default async function SeasonsPage() {
-  const seasons = await getSeasons()
+  const [seasonYears, regulationEras] = await Promise.all([
+    getSeasonYears(),
+    getRegulationErasOrEmpty(),
+  ])
+  const currentYear = seasonYears[0]
+  const firstYear = seasonYears.at(-1)
+  const decades = groupByDecade(seasonYears)
 
   return (
-    <div className="max-w-screen-xl mx-auto px-6 py-10">
+    <div className="max-w-7xl mx-auto px-6 sm:px-10 py-8 flex flex-col gap-10">
+      <Breadcrumb items={[{ label: 'Saisons' }]} />
 
-      <div className="mb-10">
-        <p className="text-xs font-semibold text-red-primary uppercase tracking-widest mb-2">
-          Archives
-        </p>
-        <h1 className="text-4xl font-black uppercase tracking-tight mb-3">
+      <header className="flex flex-col gap-3 pb-8 border-b border-white/[0.08]">
+        <div className="flex items-center gap-3">
+          <span className="h-5 w-1 bg-[#e10600] rounded-full" />
+          <span className="font-mono text-xs uppercase tracking-widest text-[#8e8e8e]">
+            Archives du championnat
+          </span>
+        </div>
+        <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tight text-white">
           Saisons
         </h1>
-        <p className="text-text-muted text-sm max-w-xl">
-          Chaque saison, une nouvelle bataille pour le titre. Retracez l&apos;histoire du championnat.
+        <p className="text-sm text-[#8e8e8e] max-w-xl leading-relaxed">
+          De {firstYear} à {currentYear} — {seasonYears.length} saisons de championnat du monde,
+          avec leur plateau et le règlement en vigueur.
         </p>
-      </div>
+      </header>
 
-      {seasons.length === 0 ? (
-        <p className="text-text-muted text-sm py-12 text-center">Aucune saison trouvée.</p>
-      ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-          {seasons.map((season) => (
-            <Link
-              key={season.year}
-              href={`/seasons/${season.year}`}
-              className="group bg-surface border border-border rounded-sm p-5 hover:border-red-primary transition-colors duration-200"
-            >
-              <p className="text-3xl font-black text-text-primary group-hover:text-red-primary transition-colors">
-                {season.year}
-              </p>
-              {season.championDriver && (
-                <p className="text-xs text-text-muted mt-3 leading-relaxed">
-                  {season.championDriver.firstName} {season.championDriver.lastName}
-                </p>
-              )}
-              {season.championTeam && (
-                <p className="text-[10px] text-text-muted mt-0.5">
-                  {season.championTeam.name}
-                </p>
-              )}
-            </Link>
-          ))}
-        </div>
+      {regulationEras.length > 0 && (
+        <section className="flex flex-col gap-4">
+          <SectionHeader
+            title="Ères réglementaires"
+            summary="Cliquez sur une ère pour voir son règlement"
+          />
+          <EraTimeline eras={regulationEras} selectedEra={null} currentYear={currentYear} />
+        </section>
       )}
+
+      {decades.map(({ decade, decadeYears }) => (
+        <section key={decade} className="flex flex-col gap-4">
+          <SectionHeader
+            title={`Années ${decade}`}
+            summary={`${decadeYears.length} saison${decadeYears.length > 1 ? 's' : ''}`}
+          />
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+            {decadeYears.map((year) => (
+              <SeasonTile
+                key={year}
+                year={year}
+                eraLabel={findEraForYear(regulationEras, year)?.label}
+                isCurrent={year === currentYear}
+              />
+            ))}
+          </div>
+        </section>
+      ))}
     </div>
   )
 }
