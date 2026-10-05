@@ -1,3 +1,4 @@
+import Breadcrumb from '@/components/ui/Breadcrumb'
 import DriversGrid from '@/components/drivers/DriversGrid'
 import Pagination from '@/components/ui/Pagination'
 
@@ -16,44 +17,51 @@ async function getDrivers({ page, status, search }) {
   const res = await fetch(`${process.env.API_URL}/drivers?${params.toString()}`, {
     cache: 'no-store',
   })
-  if (!res.ok) return { data: [], total: 0, totalPages: 0 }
+  // Une erreur de l'API (quota dépassé, serveur indisponible) ne doit pas s'afficher
+  // comme « aucun pilote trouvé » : on la laisse remonter à l'écran d'erreur
+  if (!res.ok) throw new Error(`API error ${res.status} — /drivers`)
   return res.json()
 }
 
 export default async function DriversPage({ searchParams }) {
   const { page: pageParam, status, search } = await searchParams
   const page = Math.max(1, Number(pageParam) || 1)
+  const activeStatus = status ?? 'all'
+  const activeSearch = search ?? ''
 
   const { data: drivers, total, totalPages } = await getDrivers({ page, status, search })
 
   return (
-    <div className="max-w-screen-xl mx-auto px-6 py-10">
+    <div className="max-w-7xl mx-auto px-6 sm:px-10 py-8 flex flex-col gap-8">
+      <Breadcrumb items={[{ label: 'Pilotes' }]} />
 
-      {/* En-tête */}
-      <div className="mb-10">
-        <p className="text-xs font-semibold text-red-primary uppercase tracking-widest mb-2">
-          Annuaire
-        </p>
-        <h1 className="text-4xl font-black uppercase tracking-tight mb-3">
-          Driver Registry
+      <header className="flex flex-col gap-3 pb-8 border-b border-white/[0.08]">
+        <div className="flex items-center gap-3">
+          <span className="h-5 w-1 bg-[#e10600] rounded-full" />
+          <span className="font-mono text-xs uppercase tracking-widest text-[#8e8e8e]">
+            Annuaire des pilotes
+          </span>
+        </div>
+        <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tight text-white">
+          Pilotes
         </h1>
-        <p className="text-text-muted text-sm max-w-xl">
-          De Senna à Verstappen — tous les pilotes qui ont marqué ou marquent encore la Formule 1.
+        <p className="text-sm text-[#8e8e8e] max-w-xl leading-relaxed">
+          De Fangio à Verstappen — tous les pilotes qui ont marqué ou marquent encore la Formule 1.
         </p>
-      </div>
+      </header>
 
       <DriversGrid
         drivers={drivers}
         total={total}
-        activeStatus={status ?? 'all'}
-        activeSearch={search ?? ''}
+        activeStatus={activeStatus}
+        activeSearch={activeSearch}
       />
 
       <Pagination
         basePath="/drivers"
         searchParams={{
-          ...(status && status !== 'all' ? { status } : {}),
-          ...(search ? { search } : {}),
+          ...(activeStatus !== 'all' ? { status: activeStatus } : {}),
+          ...(activeSearch ? { search: activeSearch } : {}),
         }}
         page={page}
         totalPages={totalPages}

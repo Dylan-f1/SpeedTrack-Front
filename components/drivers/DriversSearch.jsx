@@ -3,30 +3,22 @@
 // être perdu lors d'une recherche.
 export default function DriversSearch({ defaultValue = '', status }) {
   return (
-    <form action="/drivers" method="GET" className="relative w-full">
+    <form action="/drivers" method="GET" role="search" className="relative w-full">
       {status && status !== 'all' && <input type="hidden" name="status" value={status} />}
 
-      <svg
-        className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
+      <span
         aria-hidden="true"
+        className="material-symbols-outlined pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-[#5e5e5e]"
       >
-        <circle cx="11" cy="11" r="7" />
-        <line x1="21" y1="21" x2="16.65" y2="16.65" />
-      </svg>
-
+        search
+      </span>
       <input
         type="search"
         name="search"
         defaultValue={defaultValue}
-        placeholder="Rechercher un pilote par nom..."
-        aria-label="Rechercher un pilote"
-        className="w-full bg-surface-elevated text-text-primary text-sm placeholder:text-text-muted pl-11 pr-4 py-3 rounded-sm border border-border-light focus:outline-none focus:border-red-primary transition-colors"
+        placeholder="RECHERCHER UN PILOTE…"
+        aria-label="Rechercher un pilote par nom"
+        className="w-full bg-[#131313] border border-[#262626] rounded-lg pl-10 pr-3 py-2 font-mono text-xs text-white placeholder:text-[#5e5e5e] focus:outline-none focus:border-[#e10600] transition-colors"
       />
     </form>
   )
