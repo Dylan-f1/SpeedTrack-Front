@@ -1,7 +1,6 @@
 import { Fragment } from 'react'
 import Breadcrumb from '@/components/ui/Breadcrumb'
 import { Flag } from '@/components/ui/Flag'
-import { COUNTRY_NAMES } from '@/components/circuits/countryNames'
 
 const LENGTH_DECIMALS = 3
 
@@ -19,7 +18,7 @@ function buildSpecs(layout) {
 }
 
 export default function CircuitHeader({ circuit, currentLayout }) {
-  const { name, country, city } = circuit
+  const { name, country, countryName, city } = circuit
   const specs = buildSpecs(currentLayout)
 
   return (
@@ -30,7 +29,7 @@ export default function CircuitHeader({ circuit, currentLayout }) {
           <div className="flex items-center gap-2">
             <Flag code={country} />
             <span className="text-label-caps text-[#f0eded] uppercase tracking-wider ml-1">
-              {COUNTRY_NAMES[country] ?? country}
+              {countryName ?? country}
             </span>
           </div>
         )}

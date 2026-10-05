@@ -3,7 +3,6 @@ import Breadcrumb from '@/components/ui/Breadcrumb'
 import SearchForm from '@/components/ui/SearchForm'
 import SectionHeader from '@/components/ui/SectionHeader'
 import CircuitsWorldMap from '@/components/circuits/CircuitsWorldMap'
-import { COUNTRY_NAMES } from '@/components/circuits/countryNames'
 import { normalizeSearchText } from '@/lib/utils'
 
 export const metadata = {
@@ -25,12 +24,8 @@ async function getCircuits() {
   return data
 }
 
-function getCountryName(code) {
-  return COUNTRY_NAMES[code] ?? code ?? 'Pays inconnu'
-}
-
 function matchesSearch(circuit, normalizedSearch) {
-  return [circuit.name, circuit.city, getCountryName(circuit.country)].some((label) =>
+  return [circuit.name, circuit.city, circuit.countryName].some((label) =>
     normalizeSearchText(label).includes(normalizedSearch)
   )
 }
