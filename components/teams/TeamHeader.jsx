@@ -1,24 +1,12 @@
 import Image from 'next/image'
 import Breadcrumb from '@/components/ui/Breadcrumb'
 import { Flag } from '@/components/ui/Flag'
-
-// Logos officiels blancs (pensés pour des livrées sombres) : ils disparaîtraient sur le fond
-// clair utilisé pour les autres logos, qui sont noirs ou foncés. À terme, cette info
-// mériterait un champ en base plutôt qu'une liste ici.
-const LIGHT_LOGO_TEAM_SLUGS = new Set([
-  'alpine',
-  'aston-martin',
-  'williams',
-  'haas',
-  'racing-bulls',
-])
+import { getLogoBackgroundClass } from '@/components/teams/teamLogo'
 
 export default function TeamHeader({ team }) {
   const { slug, name, fullName, nationality, founded, base, logoUrl, principals = [] } = team
   const currentPrincipal = principals.find((principal) => principal.to === null)
-  const logoBackground = LIGHT_LOGO_TEAM_SLUGS.has(slug)
-    ? 'bg-[#0e0e0e] border border-[#262626]'
-    : 'bg-white'
+  const logoBackground = getLogoBackgroundClass(slug)
 
   const facts = [
     base && { label: 'Siège', value: base },

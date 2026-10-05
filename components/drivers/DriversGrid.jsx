@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import DriverCard from './DriverCard'
 import DriversFilter from './DriversFilter'
-import DriversSearch from './DriversSearch'
+import SearchForm from '@/components/ui/SearchForm'
 
 export default function DriversGrid({ drivers, total, activeStatus, activeSearch }) {
   return (
@@ -10,7 +10,13 @@ export default function DriversGrid({ drivers, total, activeStatus, activeSearch
         <DriversFilter activeStatus={activeStatus} activeSearch={activeSearch} />
         <div className="flex items-center gap-4">
           <div className="w-full lg:w-80">
-            <DriversSearch defaultValue={activeSearch} status={activeStatus} />
+            <SearchForm
+              action="/drivers"
+              defaultValue={activeSearch}
+              placeholder="RECHERCHER UN PILOTE…"
+              label="Rechercher un pilote par nom"
+              hiddenParams={activeStatus !== 'all' ? { status: activeStatus } : {}}
+            />
           </div>
           <span className="font-mono text-xs text-[#8e8e8e] whitespace-nowrap">
             <span className="text-white font-bold">{total}</span> pilote{total > 1 ? 's' : ''}
