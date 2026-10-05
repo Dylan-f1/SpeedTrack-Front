@@ -1,5 +1,6 @@
 import Breadcrumb from '@/components/ui/Breadcrumb'
-import { regulationsAPI } from '@/lib/api'
+import { findEraForYear, getRegulationEras } from '@/lib/regulations'
+import { getSeasonYears } from '@/lib/seasons'
 import {
   ERA_2026_CATEGORY,
   ERA_2026_PILLARS,
@@ -32,6 +33,7 @@ import PointsTable from '@/components/regulations/PointsTable'
 import Era2026Card from '@/components/regulations/Era2026Card'
 import FaqAccordion from '@/components/regulations/FaqAccordion'
 import RegulationErasSection from '@/components/regulations/RegulationErasSection'
+import SeasonRegulationPanel from '@/components/regulations/SeasonRegulationPanel'
 
 export const metadata = {
   title: 'Règlements',
@@ -39,18 +41,13 @@ export const metadata = {
     'Les règles sportives, techniques et financières de la Formule 1 en 2026, et ses grandes ères réglementaires.',
 }
 
-async function fetchRegulationEras() {
-  try {
-    const response = await regulationsAPI.list()
-    const eras = Array.isArray(response) ? response : response?.data
-    return Array.isArray(eras) ? eras : []
-  } catch {
-    return []
-  }
-}
-
-export default async function RegulationsPage() {
-  const regulationEras = await fetchRegulationEras()
+export default async function RegulationsPage({ searchParams }) {
+  const { season } = await searchParams
+  const [regulationEras, seasonYears] = await Promise.all([getRegulationEras(), getSeasonYears()])
+  const currentYear = seasonYears[0]
+  const requestedYear = Number(season)
+  const selectedYear = seasonYears.includes(requestedYear) ? requestedYear : currentYear
+  const selectedEra = findEraForYear(regulationEras, selectedYear)
 
   return (
     <div className="flex flex-col w-full">
@@ -100,6 +97,14 @@ export default async function RegulationsPage() {
             <SearchFilterBar filters={REGULATION_FILTERS} units={REGULATION_SEARCH_UNITS} />
           </div>
         </section>
+
+        <SeasonRegulationPanel
+          eras={regulationEras}
+          selectedEra={selectedEra}
+          selectedYear={selectedYear}
+          currentYear={currentYear}
+          seasonYears={seasonYears}
+        />
 
         <div className="w-full px-margin-desktop py-space-xl max-w-7xl mx-auto flex flex-col gap-space-xl">
           <section className="flex flex-col gap-space-md">
@@ -224,7 +229,9 @@ export default async function RegulationsPage() {
             <FaqAccordion items={FAQ_ITEMS} />
           </FilterableSection>
 
-          {regulationEras.length > 0 && <RegulationErasSection eras={regulationEras} />}
+          {regulationEras.length > 0 && (
+            <RegulationErasSection eras={regulationEras} selectedEra={selectedEra} />
+          )}
         </div>
       </RegulationsExplorer>
     </div>

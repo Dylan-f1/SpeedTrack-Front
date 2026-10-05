@@ -7,9 +7,19 @@ import RoundsTable from '@/components/seasons/RoundsTable'
 import SeasonCounters from '@/components/seasons/SeasonCounters'
 import SeasonHeader from '@/components/seasons/SeasonHeader'
 import { pluralize } from '@/components/seasons/pluralize'
+import { findEraForYear, getRegulationEras } from '@/lib/regulations'
 import { getSeasonData, groupEntriesByDriver, groupEntriesByTeam } from './getSeasonData'
 
 const PERCENT = 100
+
+// Le lien vers le règlement est un complément : s'il manque, la fiche saison reste utilisable
+async function getRegulationErasOrEmpty() {
+  try {
+    return await getRegulationEras()
+  } catch {
+    return []
+  }
+}
 
 export async function generateMetadata({ params }) {
   const { year } = await params
@@ -54,8 +64,10 @@ function buildCounters({ races, completedRaceCount, driverCount, teamCount, nati
 
 export default async function SeasonPage({ params }) {
   const { year } = await params
-  const { season, driverStandings, constructorStandings, races, seasonYears, driverEntries } =
-    await getSeasonData(year)
+  const [
+    { season, driverStandings, constructorStandings, races, seasonYears, driverEntries },
+    regulationEras,
+  ] = await Promise.all([getSeasonData(year), getRegulationErasOrEmpty()])
 
   if (!season) notFound()
 
@@ -88,6 +100,7 @@ export default async function SeasonPage({ params }) {
           championDriver={season.championDriver}
           championTeam={season.championTeam}
           summary={summary}
+          regulationEra={findEraForYear(regulationEras, seasonYear)}
         />
 
         <SeasonCounters

@@ -1,7 +1,7 @@
 import RegulationEraCard from './RegulationEraCard'
 import RegulationsSectionHeader from './RegulationsSectionHeader'
 
-export default function RegulationErasSection({ eras }) {
+export default function RegulationErasSection({ eras, selectedEra }) {
   return (
     <section className="flex flex-col gap-space-md">
       <RegulationsSectionHeader
@@ -15,7 +15,7 @@ export default function RegulationErasSection({ eras }) {
       />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter-desktop">
         {eras.map((era) => (
-          <RegulationEraCard key={era.era} era={era} />
+          <RegulationEraCard key={era.era} era={era} isSelected={era.era === selectedEra?.era} />
         ))}
       </div>
     </section>
