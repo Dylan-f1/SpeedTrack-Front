@@ -1,11 +1,9 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
-const HERO_IMAGE_URL =
-  'https://lh3.googleusercontent.com/aida-public/AB6AXuChi_hNClMpC235dF6bkJSWKiFyImFZR_p3BzfdWekHLZZwn7k4yZgHOOSxsUUplFZ-VMX4uj0USi6-kkd4GW9ZHbmAyqU1os2GBT7mqe0y_078s5BZOkAAfRd2LBSYt2cXj5i-JleF3QQWFTPoNBz_FQb5HTcd_axtTB-eUFHUJjFUnobp3MFQDhUvFp7OeZGA5mhMa3MvYnvMkBPODSJETKCR02SyOcjszzKH86U0Z8S7bU6KQKFq3Q'
 const HERO_IMAGE_SIZES = '(min-width: 1024px) 560px, 100vw'
 
-export default function HeroSection({ year }) {
+export default function HeroSection({ year, content }) {
   const seasonHref = year ? `/seasons/${year}` : '/seasons'
   const seasonLabel = year ? `EXPLORER LA SAISON ${year}` : 'EXPLORER LES SAISONS'
 
@@ -24,10 +22,12 @@ export default function HeroSection({ year }) {
           </h1>
           <div className="h-1.5 w-28 bg-[#e10600] mt-3 rounded-full"></div>
         </div>
-        <div className="space-y-1 text-lg sm:text-xl text-neutral-300">
-          <p className="font-medium text-neutral-400">La télémétrie F1 simplifiée.</p>
-          <p className="font-extrabold text-white">Données pures, sans bruit.</p>
-        </div>
+        {content && (
+          <div className="space-y-1 text-lg sm:text-xl text-neutral-300">
+            <p className="font-medium text-neutral-400">{content.taglineMuted}</p>
+            <p className="font-extrabold text-white">{content.taglineStrong}</p>
+          </div>
+        )}
         <div className="flex flex-wrap items-center gap-3 pt-2">
           <Link
             href={seasonHref}
@@ -50,20 +50,22 @@ export default function HeroSection({ year }) {
           </Link>
         </div>
       </div>
-      <div className="lg:col-span-6">
-        <div className="relative bg-gradient-to-b from-[#19191d] to-[#121214] border border-[#2b2b32] rounded-2xl p-5 shadow-2xl">
-          <div className="relative my-4 aspect-[16/9] w-full bg-black/60 rounded-xl overflow-hidden border border-[#242429]">
-            <Image
-              src={HERO_IMAGE_URL}
-              alt="Monoplace de Formule 1"
-              fill
-              priority
-              sizes={HERO_IMAGE_SIZES}
-              className="object-cover"
-            />
+      {content?.imageUrl && (
+        <div className="lg:col-span-6">
+          <div className="relative bg-gradient-to-b from-[#19191d] to-[#121214] border border-[#2b2b32] rounded-2xl p-5 shadow-2xl">
+            <div className="relative my-4 aspect-[16/9] w-full bg-black/60 rounded-xl overflow-hidden border border-[#242429]">
+              <Image
+                src={content.imageUrl}
+                alt={content.imageAlt ?? ''}
+                fill
+                priority
+                sizes={HERO_IMAGE_SIZES}
+                className="object-cover"
+              />
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </section>
   )
 }
