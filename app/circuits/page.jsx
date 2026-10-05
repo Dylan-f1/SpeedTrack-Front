@@ -1,16 +1,14 @@
 import Link from 'next/link'
 import Breadcrumb from '@/components/ui/Breadcrumb'
-import { Flag } from '@/components/ui/Flag'
 import SearchForm from '@/components/ui/SearchForm'
 import SectionHeader from '@/components/ui/SectionHeader'
-import CircuitCard from '@/components/circuits/CircuitCard'
 import CircuitsWorldMap from '@/components/circuits/CircuitsWorldMap'
 import { COUNTRY_NAMES } from '@/components/circuits/countryNames'
 import { normalizeSearchText } from '@/lib/utils'
 
 export const metadata = {
   title: 'Circuits',
-  description: 'Les circuits de la Formule 1 depuis 1950, classés par pays.',
+  description: 'Les circuits de la Formule 1 depuis 1950, sur la carte du monde.',
 }
 
 const API_PAGE_LIMIT = 100
@@ -37,22 +35,6 @@ function matchesSearch(circuit, normalizedSearch) {
   )
 }
 
-function groupByCountry(circuits) {
-  const circuitsByCountry = new Map()
-  for (const circuit of circuits) {
-    const group = circuitsByCountry.get(circuit.country) ?? []
-    group.push(circuit)
-    circuitsByCountry.set(circuit.country, group)
-  }
-  return [...circuitsByCountry.entries()]
-    .map(([country, countryCircuits]) => ({
-      country,
-      countryName: getCountryName(country),
-      circuits: countryCircuits.sort((a, b) => a.name.localeCompare(b.name, 'fr')),
-    }))
-    .sort((a, b) => a.countryName.localeCompare(b.countryName, 'fr'))
-}
-
 export default async function CircuitsPage({ searchParams }) {
   const { search } = await searchParams
   const activeSearch = search?.trim() ?? ''
@@ -61,7 +43,6 @@ export default async function CircuitsPage({ searchParams }) {
   const listedCircuits = activeSearch
     ? circuits.filter((circuit) => matchesSearch(circuit, normalizeSearchText(activeSearch)))
     : circuits
-  const countryGroups = groupByCountry(listedCircuits)
   const countryCount = new Set(circuits.map((circuit) => circuit.country)).size
 
   return (
@@ -102,44 +83,28 @@ export default async function CircuitsPage({ searchParams }) {
             />
           </div>
         </SectionHeader>
-        <CircuitsWorldMap circuits={listedCircuits} />
+        {listedCircuits.length === 0 ? (
+          <div className="bg-[#131313] border border-[#262626] rounded-xl py-16 flex flex-col items-center gap-3 text-center">
+            <span
+              aria-hidden="true"
+              className="material-symbols-outlined text-[32px] text-[#5e5e5e]"
+            >
+              search_off
+            </span>
+            <p className="text-sm text-[#8e8e8e]">
+              Aucun circuit ne correspond à « {activeSearch} ».
+            </p>
+            <Link
+              href="/circuits"
+              className="font-mono text-xs text-[#e10600] hover:text-[#ff4d4d] transition-colors"
+            >
+              Réinitialiser la recherche
+            </Link>
+          </div>
+        ) : (
+          <CircuitsWorldMap circuits={listedCircuits} />
+        )}
       </section>
-
-      {countryGroups.length > 0 && <SectionHeader title="Par pays" />}
-
-      {countryGroups.length === 0 ? (
-        <div className="bg-[#131313] border border-[#262626] rounded-xl py-16 flex flex-col items-center gap-3 text-center">
-          <span aria-hidden="true" className="material-symbols-outlined text-[32px] text-[#5e5e5e]">
-            search_off
-          </span>
-          <p className="text-sm text-[#8e8e8e]">
-            Aucun circuit ne correspond à « {activeSearch} ».
-          </p>
-          <Link
-            href="/circuits"
-            className="font-mono text-xs text-[#e10600] hover:text-[#ff4d4d] transition-colors"
-          >
-            Réinitialiser la recherche
-          </Link>
-        </div>
-      ) : (
-        <div className="flex flex-col gap-8">
-          {countryGroups.map(({ country, countryName, circuits: countryCircuits }) => (
-            <section key={country} className="flex flex-col gap-3">
-              <h3 className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-[#c8c6c5]">
-                <Flag code={country} />
-                {countryName}
-                <span className="text-[#5e5e5e]">· {countryCircuits.length}</span>
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {countryCircuits.map((circuit) => (
-                  <CircuitCard key={circuit.slug} circuit={circuit} />
-                ))}
-              </div>
-            </section>
-          ))}
-        </div>
-      )}
     </div>
   )
 }
