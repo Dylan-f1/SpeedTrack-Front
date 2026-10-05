@@ -1,21 +1,113 @@
-import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { formatDate } from '@/lib/utils'
 import { Flag } from '@/components/ui/Flag'
+import Breadcrumb from '@/components/ui/Breadcrumb'
+import ProfileStatCard from '@/components/drivers/ProfileStatCard'
+import ProfilePortraitCard from '@/components/drivers/ProfilePortraitCard'
+import ProfileCareerCard from '@/components/drivers/ProfileCareerCard'
+import ProfileTeamHistoryItem from '@/components/drivers/ProfileTeamHistoryItem'
+
+const STATUS_LABELS = {
+  champion: 'Champion du monde',
+  active: 'Actif',
+  former: 'Ancien pilote',
+}
+
+const STATUS_DOT_CLASSES = {
+  champion: 'bg-amber-400',
+  active: 'bg-emerald-400',
+  former: 'bg-neutral-500',
+}
+
+const WIKIPEDIA_LICENSE_URL = 'https://creativecommons.org/licenses/by-sa/4.0/deed.fr'
+const PERCENT = 100
+const HTTP_NOT_FOUND = 404
 
 async function getDriver(slug) {
   const res = await fetch(`${process.env.API_URL}/drivers/${slug}`, {
     cache: 'no-store',
   })
-  if (!res.ok) return null
+  if (res.status === HTTP_NOT_FOUND) return null
+  // Une autre erreur (quota de l'API dépassé, serveur indisponible) ne doit pas se
+  // déguiser en « pilote introuvable » : on la laisse remonter à l'écran d'erreur
+  if (!res.ok) throw new Error(`API error ${res.status} — /drivers/${slug}`)
   return res.json()
+}
+
+// Part des courses (en %) : null quand le pilote n'a disputé aucune course,
+// pour ne pas afficher de barre sans signification.
+function getRaceRatio(value, races) {
+  if (!races) return null
+  return Math.round((value / races) * PERCENT)
+}
+
+function formatCareerSpan(start, end) {
+  return end === null ? `${start} — Présent` : `${start} — ${end}`
+}
+
+function buildStats({ races = 0, wins = 0, poles = 0, podiums = 0, championships = 0 }) {
+  const stats = [
+    {
+      label: 'Courses disputées',
+      value: races,
+      unit: 'GP',
+      ratio: null,
+      valueClass: 'text-white',
+      unitClass: 'text-[#ff4d46] font-semibold',
+      hoverClass: 'hover:border-white/20',
+    },
+    {
+      label: 'Victoires Grand Prix',
+      value: wins,
+      unit: 'WINS',
+      ratio: getRaceRatio(wins, races),
+      valueClass: 'text-[#ff4d46]',
+      unitClass: 'text-neutral-400',
+      hoverClass: 'hover:border-[#e10600]/40',
+      barClass: 'bg-[#ff4d46]',
+    },
+    {
+      label: 'Pole positions',
+      value: poles,
+      unit: 'POLES',
+      ratio: getRaceRatio(poles, races),
+      valueClass: 'text-white',
+      unitClass: 'text-neutral-400',
+      hoverClass: 'hover:border-white/20',
+      barClass: 'bg-neutral-300',
+    },
+    {
+      label: 'Podiums en carrière',
+      value: podiums,
+      unit: 'PODIUMS',
+      ratio: getRaceRatio(podiums, races),
+      valueClass: 'text-white',
+      unitClass: 'text-neutral-400',
+      hoverClass: 'hover:border-white/20',
+      barClass: 'bg-amber-400',
+    },
+  ]
+
+  if (championships > 0) {
+    stats.push({
+      label: 'Titres mondiaux',
+      value: championships,
+      unit: championships > 1 ? 'TITRES' : 'TITRE',
+      ratio: null,
+      valueClass: 'text-amber-400',
+      unitClass: 'text-neutral-400',
+      hoverClass: 'hover:border-amber-400/40',
+    })
+  }
+
+  return stats
 }
 
 export async function generateMetadata({ params }) {
   const { slug } = await params
   const driver = await getDriver(slug)
   if (!driver) return {}
-  return { title: `${driver.firstName} ${driver.lastName}` }
+  return { title: `${driver.firstName} ${driver.lastName} — Fiche Pilote` }
 }
 
 export default async function DriverProfilePage({ params }) {
@@ -24,142 +116,200 @@ export default async function DriverProfilePage({ params }) {
   if (!driver) notFound()
 
   const {
-    firstName, lastName, nationality, dateOfBirth,
-    currentNumber, status, bio,
+    firstName,
+    lastName,
+    nationality,
+    dateOfBirth,
+    currentNumber,
+    status,
+    bio,
+    bioSource,
+    careerNarrative,
+    quote,
+    imageUrl,
+    imageCredit,
+    imageLicense,
     careerStats = {},
     teams = [],
-    quote,
-    imageUrl, imageCredit,
-    careerNarrative,
   } = driver
 
+  const fullName = `${firstName} ${lastName}`
+  const statusLabel = STATUS_LABELS[status] ?? STATUS_LABELS.former
+
+  // L'API marque la période en cours (saison la plus récente) avec to = null
+  const lastTeam = teams.at(-1) ?? null
+  const currentTeam = lastTeam?.to === null ? lastTeam : null
+
+  const hasTeams = teams.length > 0
+  const careerStart = hasTeams ? Math.min(...teams.map((team) => team.from)) : null
+  const careerEnd = hasTeams && !currentTeam ? Math.max(...teams.map((team) => team.to)) : null
+  const careerSpan = hasTeams ? formatCareerSpan(careerStart, careerEnd) : null
+  const teamCount = new Set(teams.map((team) => team.slug)).size
+  const teamsMostRecentFirst = [...teams].reverse()
+
+  const identity = [
+    currentTeam && { label: 'Écurie', value: currentTeam.name },
+    { label: 'Naissance', value: formatDate(dateOfBirth) },
+    hasTeams && { label: 'Carrière F1', value: careerSpan },
+  ].filter(Boolean)
+
+  const stats = buildStats(careerStats)
+  const hasSideColumn = Boolean(careerNarrative || quote)
+  const columnSpanClass = hasTeams && hasSideColumn ? 'lg:col-span-6' : 'lg:col-span-12'
+
   return (
-    <div>
-      {/* Hero */}
-      <section className="relative h-[480px] bg-[#0E0E0E] overflow-hidden flex items-end">
-        {imageUrl && (
-          <Image
-            src={imageUrl}
-            alt={`${firstName} ${lastName}`}
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover object-top"
+    <div className="max-w-7xl mx-auto px-6 sm:px-10 py-8 relative">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-white/[0.08] mb-8">
+        <Breadcrumb items={[{ label: 'Pilotes', href: '/drivers' }, { label: fullName }]} />
+        <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#1c1b1b] border border-white/10 rounded-md self-start md:self-auto">
+          <span
+            className={`w-2 h-2 rounded-full ${STATUS_DOT_CLASSES[status] ?? STATUS_DOT_CLASSES.former}`}
           />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/60 to-transparent" />
-
-        {imageCredit && (
-          <span className="absolute bottom-2 right-4 text-[10px] text-text-muted/60">
-            Photo : {imageCredit} (CC)
+          <span className="font-mono text-[11px] text-white/90 font-bold uppercase tracking-wider">
+            {statusLabel}
           </span>
-        )}
-
-        {/* Barre rouge verticale gauche */}
-        <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-primary" />
-
-        <div className="relative max-w-screen-xl mx-auto px-6 pb-12 w-full">
-          {/* Badge statut */}
-          <span className={`inline-block px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white mb-4 ${
-            status === 'champion' ? 'bg-amber-500' : 'bg-red-primary'
-          }`}>
-            {status === 'champion' ? 'Champion du monde' : status === 'former' ? 'Ancien pilote' : 'Actif'}
-          </span>
-
-          {/* Nom */}
-          <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tight leading-none mb-2">
-            {firstName}
-            <br />
-            <span className="text-text-secondary">{lastName}</span>
-          </h1>
-
-          {/* Meta */}
-          <div className="flex items-center gap-4 mt-4 text-sm text-text-muted">
-            <span><Flag code={nationality} /> {nationality}</span>
-            <span className="w-px h-4 bg-border" />
-            <span>{formatDate(dateOfBirth)}</span>
-            <span className="w-px h-4 bg-border" />
-            {currentNumber && <span>#{currentNumber}</span>}
-          </div>
         </div>
+      </div>
 
-        {/* Numéro watermark côté droit */}
+      <section className="relative pb-12 overflow-hidden">
         {currentNumber && (
-          <span className="absolute right-8 bottom-4 text-[180px] font-black text-white/[0.04] leading-none select-none">
-            {currentNumber}
-          </span>
+          <div className="absolute -right-6 -top-12 text-[170px] sm:text-[230px] font-mono font-black text-white/[0.03] select-none pointer-events-none leading-none z-0">
+            #{currentNumber}
+          </div>
         )}
-      </section>
-
-      {/* Stats bar */}
-      <section className="bg-surface">
-        <div className="max-w-screen-xl mx-auto px-6">
-          <div className="grid grid-cols-5 divide-x divide-border-light">
-            {[
-              { label: 'Courses', value: careerStats.races ?? 0 },
-              { label: 'Victoires', value: careerStats.wins ?? 0 },
-              { label: 'Podiums', value: careerStats.podiums ?? 0 },
-              { label: 'Poles', value: careerStats.poles ?? 0 },
-              { label: 'Titres', value: careerStats.championships ?? 0 },
-            ].map((s) => (
-              <div key={s.label} className="px-6 py-6 text-center">
-                <p className="text-3xl font-black text-text-primary">{s.value}</p>
-                <p className="text-[11px] text-text-muted uppercase tracking-widest mt-1">{s.label}</p>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+          <div className="lg:col-span-8 flex flex-col gap-4">
+            <div className="flex items-center gap-3 flex-wrap">
+              {currentNumber && (
+                <span className="px-3 py-1 rounded bg-[#e10600] text-white font-mono text-sm font-black tracking-wider">
+                  #{currentNumber}
+                </span>
+              )}
+              {currentTeam && (
+                <>
+                  <span className="text-xs font-mono uppercase tracking-widest text-neutral-400">
+                    {currentTeam.name}
+                  </span>
+                  <span className="text-neutral-600">•</span>
+                </>
+              )}
+              <span className="inline-flex items-center gap-1.5 text-xs font-mono uppercase text-[#ff4d46] bg-[#e10600]/10 px-2 py-0.5 rounded border border-[#e10600]/30">
+                <Flag code={nationality} />
+                {nationality}
+              </span>
+            </div>
+            <h1 className="text-4xl sm:text-6xl font-black uppercase tracking-tight text-white leading-none">
+              {firstName} <span className="text-[#e10600]">{lastName}</span>
+            </h1>
+            {bio && (
+              <div className="max-w-2xl">
+                <p className="text-neutral-300 text-sm sm:text-base leading-relaxed font-normal whitespace-pre-line">
+                  {bio}
+                </p>
+                {bioSource && (
+                  <p className="mt-2 text-[10px] font-mono text-neutral-500">
+                    Source : {bioSource} — texte sous licence{' '}
+                    <a
+                      href={WIKIPEDIA_LICENSE_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline hover:text-neutral-300 transition-colors"
+                    >
+                      CC BY-SA 4.0
+                    </a>
+                  </p>
+                )}
               </div>
-            ))}
+            )}
+            <div className="flex items-center gap-6 pt-2 text-xs font-mono text-neutral-400 flex-wrap">
+              {identity.map((item, index) => (
+                <div key={item.label} className="flex items-center gap-6">
+                  {index > 0 && <div className="w-px h-7 bg-white/10" />}
+                  <div>
+                    <span className="text-neutral-500 uppercase block text-[10px] tracking-wider">
+                      {item.label}
+                    </span>
+                    <span className="text-white font-semibold text-sm">{item.value}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="lg:col-span-4 flex justify-start lg:justify-end">
+            <ProfilePortraitCard
+              fullName={fullName}
+              imageUrl={imageUrl}
+              imageCredit={imageCredit}
+              imageLicense={imageLicense}
+              team={currentTeam ?? lastTeam}
+              isCurrentTeam={Boolean(currentTeam)}
+              currentNumber={currentNumber}
+            />
           </div>
         </div>
       </section>
 
-      {/* Corps */}
-      <div className="max-w-screen-xl mx-auto px-6 py-12 grid grid-cols-1 lg:grid-cols-3 gap-12">
+      <section
+        className={`grid grid-cols-2 gap-4 pb-12 ${
+          stats.length > 4 ? 'md:grid-cols-3 lg:grid-cols-5' : 'md:grid-cols-4'
+        }`}
+      >
+        {stats.map((stat) => (
+          <ProfileStatCard key={stat.label} {...stat} />
+        ))}
+      </section>
 
-        {/* Bio */}
-        <div className="lg:col-span-2 space-y-10">
-          <div>
-            <h2 className="text-xs font-semibold text-red-primary uppercase tracking-widest mb-4">
-              Biographie
-            </h2>
-            <p className="text-text-secondary leading-relaxed">{bio}</p>
-          </div>
-
-          {/* Récit de parcours */}
-          {careerNarrative && (
-            <div>
-              <h2 className="text-xs font-semibold text-red-primary uppercase tracking-widest mb-4">
-                Parcours
-              </h2>
-              <p className="text-text-secondary leading-relaxed">{careerNarrative}</p>
+      {(hasTeams || hasSideColumn) && (
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 pb-16">
+          {hasTeams && (
+            <div className={`${columnSpanClass} flex flex-col gap-4`}>
+              <div className="bg-[#181818] border border-white/[0.08] p-6 rounded-xl flex flex-col gap-4">
+                <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
+                  <span className="text-xs font-mono font-bold uppercase tracking-widest text-white">
+                    Historique des écuries F1
+                  </span>
+                  <span className="text-xs font-mono text-neutral-400 uppercase">{careerSpan}</span>
+                </div>
+                <div className="flex flex-col gap-3">
+                  {teamsMostRecentFirst.map((team) => (
+                    <ProfileTeamHistoryItem key={`${team.slug}-${team.from}`} team={team} />
+                  ))}
+                </div>
+              </div>
             </div>
           )}
 
-          {/* Quote */}
-          {quote && (
-            <blockquote className="border-l-2 border-red-primary pl-6 py-2">
-              <p className="text-lg italic text-text-secondary leading-relaxed">&ldquo;{quote}&rdquo;</p>
-            </blockquote>
+          {hasSideColumn && (
+            <div className={`${columnSpanClass} flex flex-col gap-4`}>
+              {careerNarrative && (
+                <ProfileCareerCard
+                  narrative={careerNarrative}
+                  careerStart={careerStart}
+                  careerEnd={careerEnd}
+                  careerSpan={careerSpan}
+                  teamCount={teamCount}
+                />
+              )}
+              {quote && (
+                <blockquote className="bg-[#181818] border border-white/[0.08] p-6 rounded-xl flex flex-col gap-4">
+                  <span className="pb-3 border-b border-white/[0.08] text-xs font-mono font-bold uppercase tracking-widest text-white flex items-center gap-2">
+                    <span className="material-symbols-outlined text-[16px] text-[#ff4d46]">
+                      format_quote
+                    </span>
+                    Citation
+                  </span>
+                  <p className="text-lg italic text-neutral-300 leading-relaxed">
+                    &ldquo;{quote}&rdquo;
+                  </p>
+                  <footer className="text-xs font-mono uppercase tracking-wider text-[#ff4d46]">
+                    — {fullName}
+                  </footer>
+                </blockquote>
+              )}
+            </div>
           )}
-        </div>
-
-        {/* Timeline écuries */}
-        <div>
-          <h2 className="text-xs font-semibold text-red-primary uppercase tracking-widest mb-6">
-            Équipes
-          </h2>
-          <ol className="relative border-l border-border ml-2 space-y-6">
-            {teams.map((t, i) => (
-              <li key={i} className="pl-6">
-                <span className="absolute -left-[5px] w-2.5 h-2.5 rounded-full bg-red-primary border-2 border-background" />
-                <p className="text-sm font-semibold text-text-primary">{t.name}</p>
-                <p className="text-xs text-text-muted mt-0.5">
-                  {t.from} — {t.to ?? 'présent'}
-                </p>
-              </li>
-            ))}
-          </ol>
-        </div>
-
-      </div>
+        </section>
+      )}
     </div>
   )
 }

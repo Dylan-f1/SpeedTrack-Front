@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Geist, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
@@ -8,24 +8,23 @@ const geistSans = Geist({
   subsets: ['latin'],
 })
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const jetbrainsMono = JetBrains_Mono({
+  variable: '--font-jetbrains-mono',
   subsets: ['latin'],
 })
 
 export const metadata = {
   title: {
-    default: 'SpeedTrack Racing',
-    template: '%s | SpeedTrack Racing',
+    default: 'SpeedTrack',
+    template: '%s — SpeedTrack',
   },
-  description:
-    'La référence F1 — pilotes, écuries, circuits, saisons et règlements au même endroit.',
+  description: 'La télémétrie F1 simplifiée — pilotes, écuries, circuits, saisons et règlements.',
 }
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="fr" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body className="min-h-screen bg-background text-text-primary antialiased flex flex-col">
+    <html lang="fr" className={`dark ${geistSans.variable} ${jetbrainsMono.variable}`}>
+      <body className="min-h-screen bg-background text-white antialiased flex flex-col">
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />

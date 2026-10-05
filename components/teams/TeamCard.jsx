@@ -1,58 +1,38 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { Flag } from '@/components/ui/Flag'
 
-const FALLBACK_COLOR = '#8A8A8A'
+const FALLBACK_ACCENT_COLOR = '#393939'
 
 export default function TeamCard({ team }) {
-  const { slug, name, nationality, base, founded, primaryColor, logoUrl } = team
-  const color = primaryColor ?? FALLBACK_COLOR
-  const initial = name?.charAt(0).toUpperCase()
+  const { slug, name, nationality, founded, base, primaryColor } = team
+  const details = [founded && `Fondée en ${founded}`, base].filter(Boolean).join(' · ')
 
   return (
-    <Link href={`/teams/${slug}`} className="group block">
-      <div className="relative overflow-hidden bg-surface border border-border rounded-sm p-6 h-full flex flex-col justify-between group-hover:border-red-primary transition-colors duration-200">
-
-        {/* Barre accent gauche, couleur de marque */}
-        <div
-          className="absolute left-0 top-0 bottom-0 w-[3px] opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-          style={{ backgroundColor: color }}
+    <Link
+      href={`/teams/${slug}`}
+      className="group bg-[#131313] border border-[#262626] hover:border-[#e10600]/50 rounded-xl p-4 flex flex-col gap-3 transition-colors"
+    >
+      <div className="flex items-center justify-between gap-3">
+        <span className="flex items-center gap-1.5 font-mono text-[11px] text-[#8e8e8e]">
+          <Flag code={nationality} /> {nationality}
+        </span>
+        <span
+          className="w-2 h-2 rounded-full"
+          style={{ backgroundColor: primaryColor ?? FALLBACK_ACCENT_COLOR }}
         />
-
-        {logoUrl ? (
-          // Badge clair derrière le logo : plusieurs logos d'écurie sont sombres/colorés
-          // sur fond transparent et seraient peu visibles sur le fond noir de la card
-          <div className="absolute top-3 right-3 w-14 h-14 bg-white rounded-full p-2.5 shadow-sm">
-            <Image src={logoUrl} alt="" fill className="object-contain p-2.5" />
-          </div>
-        ) : (
-          /* Repli : lettre watermark en couleur de marque, tant que le vrai logo n'est pas disponible */
+      </div>
+      <h3 className="text-base font-bold uppercase leading-tight text-white">{name}</h3>
+      <div className="mt-auto pt-3 border-t border-[#262626] flex items-center justify-between gap-3 font-mono text-xs">
+        <span className="truncate text-[#5e5e5e]">{details}</span>
+        <span className="shrink-0 flex items-center gap-1 font-semibold text-[#8e8e8e] group-hover:text-white transition-colors">
+          Fiche
           <span
-            className="absolute top-2 right-4 text-8xl font-black leading-none select-none"
-            style={{ color, opacity: 0.12 }}
+            aria-hidden="true"
+            className="material-symbols-outlined text-[14px] group-hover:translate-x-0.5 transition-transform"
           >
-            {initial}
+            arrow_forward
           </span>
-        )}
-
-        <div className="relative">
-          <p className="text-[11px] text-text-muted uppercase tracking-widest mb-3">
-            <Flag code={nationality} /> {nationality}
-          </p>
-          <h3 className="text-lg font-black uppercase tracking-tight text-text-primary leading-tight">
-            {name}
-          </h3>
-        </div>
-
-        <div className="relative mt-6 flex items-center gap-4 text-xs text-text-muted">
-          {base && <span>{base}</span>}
-          {founded && (
-            <>
-              <span className="w-px h-3 bg-border" />
-              <span>Fondée en {founded}</span>
-            </>
-          )}
-        </div>
+        </span>
       </div>
     </Link>
   )
