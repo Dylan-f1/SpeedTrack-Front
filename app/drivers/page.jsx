@@ -1,6 +1,7 @@
 import Breadcrumb from '@/components/ui/Breadcrumb'
 import DriversGrid from '@/components/drivers/DriversGrid'
 import Pagination from '@/components/ui/Pagination'
+import { apiFetch } from '@/lib/apiFetch'
 
 export const metadata = {
   title: 'Pilotes',
@@ -14,9 +15,7 @@ async function getDrivers({ page, status, search }) {
   if (status && status !== 'all') params.set('status', status)
   if (search) params.set('search', search)
 
-  const res = await fetch(`${process.env.API_URL}/drivers?${params.toString()}`, {
-    cache: 'no-store',
-  })
+  const res = await apiFetch(`/drivers?${params.toString()}`)
   // Une erreur de l'API (quota dépassé, serveur indisponible) ne doit pas s'afficher
   // comme « aucun pilote trouvé » : on la laisse remonter à l'écran d'erreur
   if (!res.ok) throw new Error(`API error ${res.status} — /drivers`)

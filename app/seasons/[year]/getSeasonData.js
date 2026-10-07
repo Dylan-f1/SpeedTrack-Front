@@ -1,11 +1,12 @@
+import { apiFetch } from '@/lib/apiFetch'
+
 const API_PAGE_LIMIT = 100
-const NO_STORE = { cache: 'no-store' }
 const HTTP_NOT_FOUND = 404
 
 // 404 = ressource absente (saison inexistante) ; toute autre erreur (quota de l'API
 // dépassé, serveur indisponible) remonte à l'écran d'erreur au lieu d'afficher une page vide
 async function fetchJson(path) {
-  const res = await fetch(`${process.env.API_URL}${path}`, NO_STORE)
+  const res = await apiFetch(path)
   if (res.status === HTTP_NOT_FOUND) return null
   if (!res.ok) throw new Error(`API error ${res.status} — ${path}`)
   return res.json()

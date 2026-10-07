@@ -6,15 +6,14 @@ import TeamHeader from '@/components/teams/TeamHeader'
 import TeamHistory from '@/components/teams/TeamHistory'
 import TeamStatCards from '@/components/teams/TeamStatCards'
 import { buildDriverRegistry } from './buildDriverRegistry'
+import { apiFetch } from '@/lib/apiFetch'
 
 // Couleur d'accent du site, utilisée quand l'écurie n'a pas de couleur de livrée en base
 const DEFAULT_ACCENT_COLOR = '#e10600'
 const HTTP_NOT_FOUND = 404
 
 async function getTeam(slug) {
-  const res = await fetch(`${process.env.API_URL}/teams/${slug}`, {
-    cache: 'no-store',
-  })
+  const res = await apiFetch(`/teams/${slug}`)
   if (res.status === HTTP_NOT_FOUND) return null
   // Une autre erreur (quota de l'API dépassé, serveur indisponible) ne doit pas se
   // déguiser en « écurie introuvable » : on la laisse remonter à l'écran d'erreur

@@ -6,6 +6,7 @@ import ProfileStatCard from '@/components/drivers/ProfileStatCard'
 import ProfilePortraitCard from '@/components/drivers/ProfilePortraitCard'
 import ProfileCareerCard from '@/components/drivers/ProfileCareerCard'
 import ProfileTeamHistoryItem from '@/components/drivers/ProfileTeamHistoryItem'
+import { apiFetch } from '@/lib/apiFetch'
 
 const STATUS_LABELS = {
   champion: 'Champion du monde',
@@ -24,9 +25,7 @@ const PERCENT = 100
 const HTTP_NOT_FOUND = 404
 
 async function getDriver(slug) {
-  const res = await fetch(`${process.env.API_URL}/drivers/${slug}`, {
-    cache: 'no-store',
-  })
+  const res = await apiFetch(`/drivers/${slug}`)
   if (res.status === HTTP_NOT_FOUND) return null
   // Une autre erreur (quota de l'API dépassé, serveur indisponible) ne doit pas se
   // déguiser en « pilote introuvable » : on la laisse remonter à l'écran d'erreur

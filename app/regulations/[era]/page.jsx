@@ -1,10 +1,9 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { apiFetch } from '@/lib/apiFetch'
 
 async function getRegulation(era) {
-  const res = await fetch(`${process.env.API_URL}/regulations/${era}`, {
-    cache: 'no-store',
-  })
+  const res = await apiFetch(`/regulations/${era}`)
   if (!res.ok) return null
   return res.json()
 }
@@ -37,7 +36,9 @@ export default async function RegulationPage({ params }) {
           </Link>
 
           {engineSpec && (
-            <p className="text-[11px] text-text-muted uppercase tracking-widest mb-3">{engineSpec}</p>
+            <p className="text-[11px] text-text-muted uppercase tracking-widest mb-3">
+              {engineSpec}
+            </p>
           )}
           <h1 className="text-5xl md:text-6xl font-black uppercase tracking-tight leading-none">
             {label ?? era}
@@ -53,7 +54,6 @@ export default async function RegulationPage({ params }) {
 
       {/* Contenu */}
       <div className="max-w-screen-xl mx-auto px-6 py-12 grid grid-cols-1 lg:grid-cols-3 gap-12">
-
         <div className="lg:col-span-2 space-y-10">
           {summary && (
             <div>

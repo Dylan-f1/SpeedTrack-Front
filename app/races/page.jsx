@@ -1,24 +1,23 @@
 import Link from 'next/link'
 import { formatDate } from '@/lib/utils'
 import { Flag } from '@/components/ui/Flag'
+import { apiFetch } from '@/lib/apiFetch'
 
 export const metadata = {
   title: 'Résultats',
-  description: "Calendrier et résultats des Grands Prix de Formule 1.",
+  description: 'Calendrier et résultats des Grands Prix de Formule 1.',
 }
 
 async function getLatestSeasonRaces() {
-  const base = process.env.API_URL
-
   // Récupère la saison la plus récente
-  const seasonsRes = await fetch(`${base}/seasons?limit=1`, { cache: 'no-store' })
+  const seasonsRes = await apiFetch(`/seasons?limit=1`)
   if (!seasonsRes.ok) return { year: null, races: [] }
 
   const { data: seasons } = await seasonsRes.json()
   const latestSeason = seasons?.[0]
   if (!latestSeason) return { year: null, races: [] }
 
-  const racesRes = await fetch(`${base}/seasons/${latestSeason.year}/races`, { cache: 'no-store' })
+  const racesRes = await apiFetch(`/seasons/${latestSeason.year}/races`)
   const races = racesRes.ok ? await racesRes.json() : []
 
   return { year: latestSeason.year, races }
@@ -29,7 +28,6 @@ export default async function RacesPage() {
 
   return (
     <div className="max-w-screen-xl mx-auto px-6 py-10">
-
       <div className="mb-10 flex items-end justify-between">
         <div>
           <p className="text-xs font-semibold text-red-primary uppercase tracking-widest mb-2">
@@ -72,7 +70,9 @@ export default async function RacesPage() {
                 </p>
                 <p className="text-xs text-text-muted mt-0.5 flex items-center gap-2">
                   {race.circuit && (
-                    <span><Flag code={race.circuit.country} /> {race.circuit.name}</span>
+                    <span>
+                      <Flag code={race.circuit.country} /> {race.circuit.name}
+                    </span>
                   )}
                 </p>
               </div>
@@ -85,14 +85,20 @@ export default async function RacesPage() {
               )}
 
               {/* Statut */}
-              <span className={`shrink-0 text-[10px] px-2 py-0.5 font-semibold uppercase tracking-wider rounded-sm ${
-                race.status === 'completed'
-                  ? 'bg-green-900/40 text-green-400'
+              <span
+                className={`shrink-0 text-[10px] px-2 py-0.5 font-semibold uppercase tracking-wider rounded-sm ${
+                  race.status === 'completed'
+                    ? 'bg-green-900/40 text-green-400'
+                    : race.status === 'cancelled'
+                      ? 'bg-red-dark text-red-light'
+                      : 'bg-surface-elevated text-text-muted'
+                }`}
+              >
+                {race.status === 'completed'
+                  ? 'Terminé'
                   : race.status === 'cancelled'
-                  ? 'bg-red-dark text-red-light'
-                  : 'bg-surface-elevated text-text-muted'
-              }`}>
-                {race.status === 'completed' ? 'Terminé' : race.status === 'cancelled' ? 'Annulé' : 'Prévu'}
+                    ? 'Annulé'
+                    : 'Prévu'}
               </span>
             </Link>
           ))}

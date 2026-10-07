@@ -4,6 +4,7 @@ import SearchForm from '@/components/ui/SearchForm'
 import SectionHeader from '@/components/ui/SectionHeader'
 import CircuitsWorldMap from '@/components/circuits/CircuitsWorldMap'
 import { normalizeSearchText } from '@/lib/utils'
+import { apiFetch } from '@/lib/apiFetch'
 
 export const metadata = {
   title: 'Circuits',
@@ -16,7 +17,7 @@ const LIST_REVALIDATE_SECONDS = 3600
 
 async function getCircuits() {
   const path = `/circuits?limit=${API_PAGE_LIMIT}`
-  const res = await fetch(`${process.env.API_URL}${path}`, {
+  const res = await apiFetch(path, {
     next: { revalidate: LIST_REVALIDATE_SECONDS },
   })
   if (!res.ok) throw new Error(`API error ${res.status} — ${path}`)

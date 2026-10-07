@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import NavLinks from './NavLinks'
+import { apiFetch } from '@/lib/apiFetch'
 
 // Le header est rendu sur chaque page : sans cache, il consommerait une requête du quota
 // de l'API (limité par IP, donc partagé par tous les visiteurs une fois déployé)
@@ -7,7 +8,7 @@ const CURRENT_SEASON_REVALIDATE_SECONDS = 3600
 
 async function getCurrentSeasonYear() {
   try {
-    const res = await fetch(`${process.env.API_URL}/seasons?limit=1`, {
+    const res = await apiFetch(`/seasons?limit=1`, {
       next: { revalidate: CURRENT_SEASON_REVALIDATE_SECONDS },
     })
     if (!res.ok) return null
