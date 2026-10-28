@@ -29,11 +29,15 @@ export default async function HomePage() {
   const [year, heroContent] = await Promise.all([fetchCurrentSeasonYear(), fetchHeroContent()])
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+    <>
       <HeroSection year={year} content={heroContent} />
-      {year && <LastRaceSection year={year} />}
-      {year && <StandingsSection year={year} />}
       <QuickAccessSection />
-    </div>
+      {year && (
+        <div className="mx-auto max-w-7xl space-y-12 px-4 pb-16 sm:px-6 lg:px-8">
+          <LastRaceSection year={year} />
+          <StandingsSection year={year} />
+        </div>
+      )}
+    </>
   )
 }

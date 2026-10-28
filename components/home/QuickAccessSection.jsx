@@ -1,6 +1,10 @@
 import Link from 'next/link'
 import { circuitsAPI, driversAPI, teamsAPI } from '@/lib/api'
-import SectionTitle from './SectionTitle'
+import { getRegulationEras } from '@/lib/regulations'
+import RacingLine from './RacingLine'
+
+const SLIDE_ON_HOVER =
+  'transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:translate-x-4 group-focus-visible:translate-x-4 motion-reduce:transform-none'
 
 async function fetchTotal(request) {
   try {
@@ -11,71 +15,90 @@ async function fetchTotal(request) {
   }
 }
 
-function formatStat(total, label) {
-  return total === null ? label : `${total} ${label}`
+async function fetchEraCount() {
+  try {
+    return (await getRegulationEras()).length
+  } catch {
+    return null
+  }
 }
 
 export default async function QuickAccessSection() {
-  const [activeDriversTotal, teamsTotal, circuitsTotal] = await Promise.all([
+  const [activeDriversTotal, teamsTotal, circuitsTotal, eraCount] = await Promise.all([
     fetchTotal(driversAPI.list({ status: 'active', limit: 1 })),
     fetchTotal(teamsAPI.list({ limit: 1 })),
     fetchTotal(circuitsAPI.list({ limit: 1 })),
+    fetchEraCount(),
   ])
 
-  const shortcuts = [
+  // Les rubriques sont les virages du tour : V1, V2… dans l'ordre du parcours
+  const corners = [
     {
-      stat: formatStat(activeDriversTotal, 'PILOTES ACTIFS'),
-      title: 'PILOTES',
-      description: 'Biographies, stats & victoires',
+      title: 'Pilotes',
+      total: activeDriversTotal,
+      description: 'Biographies, stats et victoires',
       href: '/drivers',
     },
     {
-      stat: formatStat(teamsTotal, 'ÉCURIES'),
-      title: 'ÉCURIES',
-      description: 'Histoire, palmarès & pilotes',
+      title: 'Écuries',
+      total: teamsTotal,
+      description: 'Histoire, palmarès et pilotes',
       href: '/teams',
     },
     {
-      stat: formatStat(circuitsTotal, 'CIRCUITS'),
-      title: 'CIRCUITS',
-      description: 'Tracés, records & histoire',
+      title: 'Circuits',
+      total: circuitsTotal,
+      description: 'Tracés, records et histoire',
       href: '/circuits',
     },
     {
-      stat: 'FIA',
-      title: 'RÈGLEMENTS',
-      description: 'Ères techniques & sportives',
+      title: 'Règlements',
+      total: eraCount,
+      description: 'Ères techniques et sportives',
       href: '/regulations',
     },
   ]
 
   return (
-    <section className="space-y-4">
-      <div className="border-b border-[#24242a] pb-3">
-        <SectionTitle>Accès Rapide SpeedTrack</SectionTitle>
+    <section className="relative mx-auto grid max-w-[1400px] grid-cols-1 gap-6 px-5 py-[72px] sm:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,2.2fr)] lg:gap-12 lg:py-[110px]">
+      <RacingLine />
+      <div className="self-start">
+        <h2 className="text-[clamp(32px,3.6vw,52px)] font-extrabold leading-none tracking-[-0.04em]">
+          Explorer la Formule 1
+        </h2>
+        <p className="mt-3 text-[#8e8e8e]">Un tour en {corners.length} virages</p>
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {shortcuts.map((shortcut) => (
+      <nav aria-label="Accès rapide aux rubriques">
+        {corners.map((corner, index) => (
           <Link
-            key={shortcut.href}
-            href={shortcut.href}
-            className="group p-5 bg-[#141416] hover:bg-[#1a1a1f] border border-[#24242a] hover:border-[#e10600]/60 rounded-xl transition duration-200 flex flex-col justify-between h-36"
+            key={corner.href}
+            href={corner.href}
+            data-corner
+            className="group relative grid grid-cols-[minmax(0,1fr)_auto] gap-x-6 gap-y-1.5 border-t border-border py-7 last:border-b"
           >
-            <div className="flex justify-between items-center text-neutral-400 group-hover:text-white">
-              <span className="text-xs font-mono uppercase">{shortcut.stat}</span>
-              <span className="material-symbols-outlined text-xl text-neutral-500 group-hover:text-[#e10600] transition">
-                arrow_forward
+            {/* Survol : le contenu glisse (transform, sans recalcul de mise en page) et un
+                trait d'accent apparaît à gauche */}
+            <span
+              aria-hidden="true"
+              className="absolute inset-y-0 left-0 w-[3px] origin-left scale-x-0 bg-red-primary transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:scale-x-100 group-focus-visible:scale-x-100"
+            />
+            <span
+              className={`text-[26px] font-extrabold tracking-[-0.03em] lg:text-[32px] ${SLIDE_ON_HOVER}`}
+            >
+              <span className="mr-3 inline-block min-w-[2.5ch] align-middle text-[15px] font-bold text-red-primary">
+                V{index + 1}
               </span>
-            </div>
-            <div>
-              <h4 className="text-xl font-black text-white group-hover:text-[#e10600] transition">
-                {shortcut.title}
-              </h4>
-              <p className="text-xs text-neutral-400 mt-1">{shortcut.description}</p>
-            </div>
+              {corner.title}
+            </span>
+            {corner.total !== null && (
+              <span className="row-span-2 self-center text-[30px] font-extrabold tracking-[-0.03em] text-text-secondary tabular-nums lg:text-[44px]">
+                {corner.total}
+              </span>
+            )}
+            <span className={`text-[#8e8e8e] ${SLIDE_ON_HOVER}`}>{corner.description}</span>
           </Link>
         ))}
-      </div>
+      </nav>
     </section>
   )
 }
