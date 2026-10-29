@@ -1,10 +1,8 @@
 import Link from 'next/link'
 import { circuitsAPI, driversAPI, teamsAPI } from '@/lib/api'
 import { getRegulationEras } from '@/lib/regulations'
+import { ROW_ACCENT_BAR, ROW_SLIDE } from '@/components/ui/rowHover'
 import RacingLine from './RacingLine'
-
-const SLIDE_ON_HOVER =
-  'transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:translate-x-4 group-focus-visible:translate-x-4 motion-reduce:transform-none'
 
 async function fetchTotal(request) {
   try {
@@ -78,12 +76,9 @@ export default async function QuickAccessSection() {
           >
             {/* Survol : le contenu glisse (transform, sans recalcul de mise en page) et un
                 trait d'accent apparaît à gauche */}
+            <span aria-hidden="true" className={ROW_ACCENT_BAR} />
             <span
-              aria-hidden="true"
-              className="absolute inset-y-0 left-0 w-[3px] origin-left scale-x-0 bg-red-primary transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:scale-x-100 group-focus-visible:scale-x-100"
-            />
-            <span
-              className={`text-[26px] font-extrabold tracking-[-0.03em] lg:text-[32px] ${SLIDE_ON_HOVER}`}
+              className={`text-[26px] font-extrabold tracking-[-0.03em] lg:text-[32px] ${ROW_SLIDE}`}
             >
               <span className="mr-3 inline-block min-w-[2.5ch] align-middle text-[15px] font-bold text-red-primary">
                 V{index + 1}
@@ -95,7 +90,7 @@ export default async function QuickAccessSection() {
                 {corner.total}
               </span>
             )}
-            <span className={`text-[#8e8e8e] ${SLIDE_ON_HOVER}`}>{corner.description}</span>
+            <span className={`text-[#8e8e8e] ${ROW_SLIDE}`}>{corner.description}</span>
           </Link>
         ))}
       </nav>

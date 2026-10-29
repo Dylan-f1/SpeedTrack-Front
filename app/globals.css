@@ -131,6 +131,22 @@ body {
   .hero-link:hover {
     text-decoration-color: #e10600;
   }
+
+  /* Coins biseautés en haut à gauche et en bas à droite, comme une découpe d'aileron */
+  .chamfer {
+    clip-path: polygon(
+      12px 0,
+      100% 0,
+      100% calc(100% - 12px),
+      calc(100% - 12px) 100%,
+      0 100%,
+      0 12px
+    );
+  }
+  /* clip-path masque tout ce qui dépasse : le contour de focus est dessiné à l'intérieur */
+  .chamfer:focus-visible {
+    outline-offset: -3px;
+  }
 }
 
 @layer base {

@@ -8,24 +8,17 @@ export default function SearchForm({
   hiddenParams = {},
 }) {
   return (
-    <form action={action} method="GET" role="search" className="relative w-full">
+    <form action={action} method="GET" role="search" className="w-full">
       {Object.entries(hiddenParams).map(([name, value]) => (
         <input key={name} type="hidden" name={name} value={value} />
       ))}
-
-      <span
-        aria-hidden="true"
-        className="material-symbols-outlined pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-[#5e5e5e]"
-      >
-        search
-      </span>
       <input
         type="search"
         name="search"
         defaultValue={defaultValue}
         placeholder={placeholder}
         aria-label={label}
-        className="w-full bg-[#131313] border border-[#262626] rounded-lg pl-10 pr-3 py-2 font-mono text-xs text-white placeholder:text-[#5e5e5e] focus:outline-none focus:border-[#e10600] transition-colors"
+        className="chamfer min-h-12 w-full border border-border bg-transparent px-4 text-white transition-colors placeholder:text-[#8e8e8e] focus:border-red-primary focus:outline-none"
       />
     </form>
   )
