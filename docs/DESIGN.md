@@ -20,8 +20,11 @@ d'un décor.
 - Trajectoire : trait rouge de 3 px, extrémités arrondies, posé sur une piste fantôme en
   pointillés gris ; se dessine selon la progression du défilement ; masquée sous 1024 px ; pas
   d'animation si `prefers-reduced-motion`.
-- Ouverture de page : le titre de la page en très grand, sur toute la largeur, **entier** (jamais
-  coupé par le bord).
+- Titre géant pleine largeur, **entier** (jamais coupé par le bord) : **réservé à l'accueil**.
+- Pages intérieures (décision du 2026-10-28, le mot géant prenait tout l'écran sur grand
+  moniteur) : ouverture compacte, fil d'Ariane, titre de 48 à 88 px, introduction, et à droite
+  2 ou 3 chiffres clés réels (trait rouge sur le premier). Le contenu doit commencer dans le
+  premier écran.
 
 ## Typographie
 

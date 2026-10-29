@@ -22,6 +22,28 @@
 - **Deuxième tour** : 4 ressentis sur l'accueil (Premium, Magazine, Outil, Cinématique) dans
   `public/directions.html`, avec un sélecteur d'accent par écurie.
 
+## 2026-10-29 — Page Pilotes : affichage façon wikily.gg
+
+- **Demande de Dylan** : reprendre l'affichage de https://wikily.gg/ark-survival-ascended/maps.
+- **Repris** : recherche + filtre segmenté avec totaux, sections titrées, grille de vignettes
+  portrait 3:4 aux coins biseautés (`.chamfer`), étiquette en haut à gauche, nom et chiffres sur
+  un dégradé en bas.
+- **Adapté à SpeedTrack** : couleurs du site, Schibsted Grotesk, étiquette = numéro sur la
+  couleur d'écurie (ou titres en rouge), drapeau, sections « Plateau 2026 » / « Anciens
+  pilotes ». Sous 640 px, les chiffres sont masqués pour laisser voir la photo.
+- **Abandonné** : titre géant sur les pages intérieures, liste en lignes, les prototypes A/B/C.
+
+## 2026-10-28 — Page Pilotes : autres designs demandés
+
+- **Retour de Dylan** : la liste en lignes sans photo ne le convainc pas ; il demande un autre
+  design.
+- **3 propositions** dans `public/pilotes.html` (données réelles exportées dans
+  `public/pilotes-data.json`, à ne pas commiter) : A « Grille de départ » (22 titulaires en
+  grille décalée, trajectoire dans l'allée), B « Index encyclopédique » (A–Z en colonnes, aperçu
+  au survol), C « Mur de portraits » (mosaïque noir et blanc, couleur au survol).
+- **Constat** : beaucoup de photos en base ne sont pas des portraits (Hamilton à deux, pancarte
+  pour Alonso, podium pour Verstappen, voiture pour Bearman) ; A et C en dépendent.
+
 ## 2026-10-28 — Pas de copie : une signature propre à SpeedTrack
 
 - **Retour de Dylan** : refus de s'inspirer des sites existants ; il veut une identité propre à

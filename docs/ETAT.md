@@ -33,7 +33,14 @@ refaire l'identité visuelle du site en gardant les textes et les données.
 - Reste sur l'accueil : bloc champion (attend `Season.championDriver`, rempli par la promotion
   des données), restylage de « Dernière manche » et « Classement » (masqués tant qu'il n'y a pas
   de résultats), diaporama du hero (attend des images), pied de page.
-- Pages suivantes, une par une : pilotes, fiche pilote, écuries, fiche écurie, circuits, saisons,
+- Accueil commité (`607e307`, `af22829`, docs `ab4ae7b`), non poussé.
+- Page Pilotes refaite (non commitée) sur le modèle d'affichage de wikily.gg demandé par Dylan :
+  ouverture compacte avec chiffres clés (`PageOpening`), recherche, filtre segmenté avec totaux,
+  sections « Plateau 2026 » puis « Anciens pilotes » (partition sans doublon), grille de
+  vignettes biseautées 3:4 (`DriverCard`, photo recadrée sur le visage par Cloudinary).
+  Composants partagés restylés : fil d'Ariane, recherche, pagination. Backend : couleur d'écurie ajoutée à
+  `currentTeam` (commit `187764d` sur `dev`, non poussé).
+- Pages suivantes, une par une : fiche pilote, écuries, fiche écurie, circuits, saisons,
   règlements. Prototypes jetables dans `public/*.html` et `public/moodboard/`, à ne pas commiter.
 
 ## Inventaire des données (2026-10-26)
