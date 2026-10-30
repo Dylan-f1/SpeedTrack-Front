@@ -58,6 +58,8 @@ Sur les fiches pilote et écurie, l'accent prend la **couleur de l'écurie** (`T
 - Listes en lignes séparées par des filets, pas de cartes ; survol = décalage de 16 px et trait
   d'accent à gauche.
 - Écran partagé couleur d'écurie + texte pour les blocs pilote ou écurie mis en avant.
+- Fiches : ouverture en écran partagé, bande de chiffres clés, puis texte à gauche et colonne
+  latérale fixe à droite (écuries du pilote), comme l'encadré d'une fiche encyclopédique.
 
 ## Images
 

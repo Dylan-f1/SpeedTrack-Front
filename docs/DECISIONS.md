@@ -22,6 +22,48 @@
 - **Deuxième tour** : 4 ressentis sur l'accueil (Premium, Magazine, Outil, Cinématique) dans
   `public/directions.html`, avec un sélecteur d'accent par écurie.
 
+## 2026-10-30 — Vignettes pilotes : chiffres au survol
+
+- **Demande de Dylan** : n'afficher Grands Prix / victoires / podiums qu'au survol de la vignette.
+- **Fait** : au repos, le bloc texte est décalé de 84 px vers le bas (chiffres masqués par la
+  carte) avec un dégradé léger ; au survol ou au focus clavier, il remonte (`translate`, 200 ms,
+  `cubic-bezier(0.23,1,0.32,1)`), les chiffres et un dégradé plus haut apparaissent en fondu.
+  Écrans tactiles : pas de survol, donc pas de chiffres (déjà masqués sous 640 px).
+
+## 2026-10-30 — Fiche pilote : écuries dans une colonne latérale
+
+- **Retour de Dylan** : les 3 variantes (relais, saison par saison, bilan) sont « nulles » ; il
+  propose de mettre les écuries sur le côté.
+- **Fait** : colonne latérale de 340 px à droite du texte (`TeamsAside`), fixe au défilement,
+  comme l'encadré d'une fiche encyclopédique : une ligne par écurie dans l'ordre d'arrivée, trait
+  à sa couleur, années regroupées (« 2003–2006, 2008–2009 »), nombre de saisons. Sous 1024 px,
+  elle passe avant la biographie. Les sections du texte ont maintenant le titre au-dessus.
+- **Retiré** : les 3 variantes et leur sélecteur.
+
+## 2026-10-29 — Fiche pilote : section Écuries à revoir
+
+- **Retour de Dylan** : la liste des écuries en lignes n'est « pas adéquate ».
+- **3 variantes** commutables sur la fiche (`?ecuries=relais|saisons|bilan`, sélecteur temporaire
+  en pointillés) : A « Relais » (frise proportionnelle façon stratégie de course, années sans
+  volant en pointillés, légende avec les années), B « Saison par saison » (une case par année à
+  la couleur de l'écurie, numéro si connu, saison partagée coupée en deux), C « Bilan par
+  écurie » (nombre de saisons en grand à la couleur de l'écurie, part de la carrière, années).
+- **Données** : l'API renvoie désormais `seasons` (écurie et numéro par saison). Écuries
+  historiques sans couleur en base : gris en alternance, pas de couleur inventée.
+
+## 2026-10-29 — Fiche pilote
+
+- **Décision** : décliner la liste plutôt que réinventer. Ouverture en écran partagé (prévue dans
+  `DESIGN.md`) : panneau à la couleur de la dernière écurie, numéro de course géant, portrait
+  biseauté comme les vignettes de la liste. Chiffres clés en bande (même langage que
+  `PageOpening`), puis sections en deux colonnes à titre fixe, écuries en lignes avec la couleur
+  de chaque écurie.
+- **Pourquoi** : garder la continuité liste → fiche ; les cartes arrondies, pastilles et icônes de
+  l'ancienne fiche faisaient « tableau de bord généré ».
+- **Crédit photo conservé** en bas de fiche : les photos déjà en base sont sous CC BY-SA, la licence
+  l'impose.
+- **Sans photo** : le panneau garde l'initiale en grand sur ordinateur et disparaît sur mobile.
+
 ## 2026-10-29 — Page Pilotes : affichage façon wikily.gg
 
 - **Demande de Dylan** : reprendre l'affichage de https://wikily.gg/ark-survival-ascended/maps.

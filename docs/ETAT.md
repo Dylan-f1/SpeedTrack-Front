@@ -34,7 +34,14 @@ refaire l'identité visuelle du site en gardant les textes et les données.
   des données), restylage de « Dernière manche » et « Classement » (masqués tant qu'il n'y a pas
   de résultats), diaporama du hero (attend des images), pied de page.
 - Accueil commité (`607e307`, `af22829`, docs `ab4ae7b`), non poussé.
-- Page Pilotes refaite (non commitée) sur le modèle d'affichage de wikily.gg demandé par Dylan :
+- Fiche pilote refaite (non commitée, en attente du retour de Dylan) : ouverture en écran partagé
+  (identité à gauche, panneau couleur d'écurie avec numéro géant et portrait biseauté à droite),
+  bande de chiffres clés, texte (Biographie / Parcours / Citation) à gauche et écuries dans une
+  colonne latérale fixe à droite (`TeamsAside`, 2026-10-30), en attente du retour de Dylan.
+  Backend : couleur d'écurie ajoutée aux périodes de `GET /drivers/:slug` (non commité, branche
+  `feature/collecte-donnees`). Limites : photos de podium (Verstappen), panneau sans photo pour
+  les anciens, 0 pole avant 1994 (données).
+- Page Pilotes refaite (commit `d89e717`) sur le modèle d'affichage de wikily.gg demandé par Dylan :
   ouverture compacte avec chiffres clés (`PageOpening`), recherche, filtre segmenté avec totaux,
   sections « Plateau 2026 » puis « Anciens pilotes » (partition sans doublon), grille de
   vignettes biseautées 3:4 (`DriverCard`, photo recadrée sur le visage par Cloudinary).
