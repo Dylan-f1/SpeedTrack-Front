@@ -6,6 +6,9 @@ import { readableTextColor } from '@/lib/color'
 
 const PHOTO_WIDTH = 360
 const PHOTO_HEIGHT = 480
+const EASE_OUT = 'ease-[cubic-bezier(0.23,1,0.32,1)]'
+// Chiffres de carrière révélés au survol, et au focus clavier pour ne pas les réserver à la souris
+const REVEAL_OPACITY = 'group-hover:opacity-100 group-focus-visible:opacity-100'
 
 function pluralize(count, singular, plural) {
   return count > 1 ? plural : singular
@@ -69,7 +72,11 @@ export default function DriverCard({ driver }) {
           {currentNumber ?? lastName[0]}
         </span>
       )}
-      <span className="absolute inset-0 bg-[linear-gradient(0deg,#131313_0%,rgba(19,19,19,.94)_38%,rgba(19,19,19,.6)_52%,transparent_70%)]" />
+      {/* Dégradé léger au repos ; au survol, un second plus haut assure la lisibilité des chiffres */}
+      <span className="absolute inset-0 bg-[linear-gradient(0deg,#131313_0%,rgba(19,19,19,.85)_22%,transparent_50%)]" />
+      <span
+        className={`absolute inset-0 bg-[linear-gradient(0deg,#131313_0%,rgba(19,19,19,.94)_38%,rgba(19,19,19,.6)_52%,transparent_70%)] opacity-0 transition-opacity duration-200 ${REVEAL_OPACITY}`}
+      />
 
       <CardBadge
         currentNumber={currentNumber}
@@ -78,7 +85,11 @@ export default function DriverCard({ driver }) {
       />
       <Flag code={nationality} className="absolute right-3 top-3" />
 
-      <span className="absolute inset-x-0 bottom-0 p-3.5">
+      {/* Au repos, le bloc est décalé vers le bas de la hauteur des chiffres (masqués par
+          l'overflow de la carte) ; au survol, il remonte et les chiffres apparaissent */}
+      <span
+        className={`absolute inset-x-0 bottom-0 p-3.5 transition-transform duration-200 ${EASE_OUT} sm:translate-y-[84px] sm:group-hover:translate-y-0 sm:group-focus-visible:translate-y-0 motion-reduce:transition-none`}
+      >
         <span className="block text-sm text-text-secondary">{firstName}</span>
         <span className="block text-[19px] font-extrabold leading-tight tracking-[-0.02em]">
           {lastName}
@@ -97,8 +108,11 @@ export default function DriverCard({ driver }) {
             'Retraité'
           )}
         </span>
-        {/* Sur deux colonnes étroites (mobile), les chiffres masqueraient toute la photo */}
-        <span className="mt-2 hidden border-t border-white/10 pt-2 text-[13px] leading-relaxed text-text-secondary tabular-nums sm:block">
+        {/* Hauteur fixe : le décalage de 84 px (mt-2 + h-[76px]) doit la couvrir exactement.
+            Sur deux colonnes étroites (mobile), les chiffres masqueraient toute la photo. */}
+        <span
+          className={`mt-2 hidden h-[76px] border-t border-white/10 pt-2 text-[13px] leading-relaxed text-text-secondary tabular-nums opacity-0 transition-opacity duration-200 sm:block ${REVEAL_OPACITY}`}
+        >
           {stats.map((stat) => (
             <span key={stat} className="block">
               {stat}
