@@ -1,15 +1,20 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { formatDate } from '@/lib/utils'
+import { faceCrop } from '@/lib/cloudinary'
 import { Flag, countryName } from '@/components/ui/Flag'
-import ProfileOpening from '@/components/drivers/ProfileOpening'
-import ProfileSection from '@/components/drivers/ProfileSection'
+import KeyFigures from '@/components/profile/KeyFigures'
+import ProfileLayout from '@/components/profile/ProfileLayout'
+import ProfileOpening from '@/components/profile/ProfileOpening'
+import ProfileSection from '@/components/profile/ProfileSection'
 import TeamsAside from '@/components/drivers/TeamsAside'
 import { apiFetch } from '@/lib/apiFetch'
 
 const WIKIPEDIA_LICENSE_URL = 'https://creativecommons.org/licenses/by-sa/4.0/deed.fr'
 const SPEEDTRACK_RED = '#e10600'
-const BORDER_COLOR = '#353534'
+const PORTRAIT_WIDTH = 600
+const PORTRAIT_HEIGHT = 800
 const PERCENT = 100
 const HTTP_NOT_FOUND = 404
 
@@ -26,10 +31,10 @@ function pluralize(count, singular, plural) {
   return count > 1 ? plural : singular
 }
 
-// Part des courses (en %) : null quand le pilote n'a disputé aucune course
+// Part des courses : rien quand le pilote n'a disputé aucune course
 function getRaceRatio(value, races) {
   if (!races) return null
-  return Math.round((value / races) * PERCENT)
+  return `${Math.round((value / races) * PERCENT)} % des courses`
 }
 
 function formatCareerSpan(start, end) {
@@ -49,17 +54,17 @@ function buildFigures({ races = 0, wins = 0, poles = 0, podiums = 0, championshi
     {
       value: wins,
       label: pluralize(wins, 'Victoire', 'Victoires'),
-      ratio: getRaceRatio(wins, races),
+      note: getRaceRatio(wins, races),
     },
     {
       value: poles,
       label: pluralize(poles, 'Pole position', 'Pole positions'),
-      ratio: getRaceRatio(poles, races),
+      note: getRaceRatio(poles, races),
     },
     {
       value: podiums,
       label: pluralize(podiums, 'Podium', 'Podiums'),
-      ratio: getRaceRatio(podiums, races),
+      note: getRaceRatio(podiums, races),
     },
   ]
   if (championships > 0) {
@@ -145,91 +150,86 @@ export default async function DriverProfilePage({ params }) {
   return (
     <div className="pb-24">
       <ProfileOpening
-        firstName={firstName}
-        lastName={lastName}
-        imageUrl={imageUrl}
-        number={currentTeam ? currentNumber : null}
-        accentColor={teamColor}
+        breadcrumb={[{ label: 'Pilotes', href: '/drivers' }, { label: fullName }]}
+        kicker={firstName}
+        title={lastName}
         facts={facts}
+        panelColor={teamColor}
+        // Numéro de course, ou l'initiale pour un pilote sans numéro connu
+        panelMark={(currentTeam ? currentNumber : null) ?? lastName[0]}
+        media={
+          imageUrl && (
+            <div className="chamfer absolute bottom-0 left-1/2 aspect-[3/4] w-[min(64%,340px)] -translate-x-1/2 bg-surface lg:bottom-14">
+              <Image
+                src={faceCrop(imageUrl, PORTRAIT_WIDTH, PORTRAIT_HEIGHT)}
+                alt={fullName}
+                fill
+                priority
+                unoptimized
+                className="object-cover"
+              />
+            </div>
+          )
+        }
       />
 
       <div className="mx-auto max-w-[1400px] px-5 sm:px-8">
-        <dl className="grid grid-cols-2 gap-x-6 gap-y-8 border-t border-border py-10 sm:grid-cols-3 lg:grid-cols-5">
-          {figures.map(({ value, label, ratio }, index) => (
-            <div
-              key={label}
-              className="flex flex-col-reverse justify-end border-l-2 pl-4"
-              style={{ borderColor: index === 0 ? accentColor : BORDER_COLOR }}
-            >
-              <dt className="mt-2 text-[#8e8e8e]">
-                <span className="block font-semibold text-text-secondary">{label}</span>
-                {ratio != null && <span className="text-sm">{ratio} % des courses</span>}
-              </dt>
-              <dd className="text-[clamp(40px,4.4vw,64px)] font-extrabold leading-none tracking-[-0.04em] tabular-nums">
-                {value}
-              </dd>
-            </div>
-          ))}
-        </dl>
+        <KeyFigures figures={figures} accentColor={accentColor} />
 
-        {/* Texte à gauche, écuries dans une colonne latérale fixe à droite (au-dessus du texte
-            sous 1024 px, pour rester visibles sans défiler toute la fiche) */}
-        <div className="grid grid-cols-1 gap-x-16 lg:grid-cols-[minmax(0,1fr)_340px]">
-          {seasons.length > 0 && (
-            <div className="lg:sticky lg:top-20 lg:order-last lg:self-start">
+        <ProfileLayout
+          aside={
+            seasons.length > 0 && (
               <TeamsAside
                 seasons={seasons}
                 isCurrent={Boolean(currentTeam)}
                 careerSpan={careerSpan}
               />
-            </div>
+            )
+          }
+        >
+          {bio && (
+            <ProfileSection title="Biographie" accentColor={accentColor}>
+              <p className="max-w-[65ch] whitespace-pre-line text-lg leading-relaxed text-text-secondary">
+                {bio}
+              </p>
+              {bioSource && (
+                <p className="mt-4 text-sm text-[#8e8e8e]">
+                  Source : {bioSource}, texte sous licence{' '}
+                  <a
+                    href={WIKIPEDIA_LICENSE_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline hover:text-text-secondary"
+                  >
+                    CC BY-SA 4.0
+                  </a>
+                </p>
+              )}
+            </ProfileSection>
           )}
 
-          <div className="min-w-0">
-            {bio && (
-              <ProfileSection title="Biographie" accentColor={accentColor}>
-                <p className="max-w-[65ch] whitespace-pre-line text-lg leading-relaxed text-text-secondary">
-                  {bio}
-                </p>
-                {bioSource && (
-                  <p className="mt-4 text-sm text-[#8e8e8e]">
-                    Source : {bioSource}, texte sous licence{' '}
-                    <a
-                      href={WIKIPEDIA_LICENSE_URL}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="underline hover:text-text-secondary"
-                    >
-                      CC BY-SA 4.0
-                    </a>
-                  </p>
-                )}
-              </ProfileSection>
-            )}
+          {careerNarrative && (
+            <ProfileSection title="Parcours" accentColor={accentColor}>
+              <p className="max-w-[65ch] whitespace-pre-line text-lg leading-relaxed text-text-secondary">
+                {careerNarrative}
+              </p>
+            </ProfileSection>
+          )}
 
-            {careerNarrative && (
-              <ProfileSection title="Parcours" accentColor={accentColor}>
-                <p className="max-w-[65ch] whitespace-pre-line text-lg leading-relaxed text-text-secondary">
-                  {careerNarrative}
+          {quote && (
+            <ProfileSection title="Citation" accentColor={accentColor}>
+              <blockquote
+                className="max-w-[40ch] border-l-2 pl-6"
+                style={{ borderColor: accentColor }}
+              >
+                <p className="text-[clamp(22px,2.2vw,30px)] font-medium leading-snug">
+                  « {quote} »
                 </p>
-              </ProfileSection>
-            )}
-
-            {quote && (
-              <ProfileSection title="Citation" accentColor={accentColor}>
-                <blockquote
-                  className="max-w-[40ch] border-l-2 pl-6"
-                  style={{ borderColor: accentColor }}
-                >
-                  <p className="text-[clamp(22px,2.2vw,30px)] font-medium leading-snug">
-                    « {quote} »
-                  </p>
-                  <footer className="mt-3 text-[#8e8e8e]">{fullName}</footer>
-                </blockquote>
-              </ProfileSection>
-            )}
-          </div>
-        </div>
+                <footer className="mt-3 text-[#8e8e8e]">{fullName}</footer>
+              </blockquote>
+            </ProfileSection>
+          )}
+        </ProfileLayout>
 
         {/* Les photos en base sont sous licence Creative Commons : le crédit est obligatoire */}
         {imageUrl && imageCredit && (

@@ -1,7 +1,7 @@
 // Période d'un mandat ou d'une entité : `to` null signifie « toujours en cours »
 export function formatPeriod(from, to) {
   if (from === to) return `${from}`
-  return `${from} — ${to ?? 'présent'}`
+  return `${from} – ${to ?? 'présent'}`
 }
 
 // Compacte une liste d'années triées en plages : [2007, 2008, 2009, 2014] → « 2007–2009, 2014 »
