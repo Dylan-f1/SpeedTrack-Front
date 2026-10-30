@@ -22,6 +22,17 @@
 - **Deuxième tour** : 4 ressentis sur l'accueil (Premium, Magazine, Outil, Cinématique) dans
   `public/directions.html`, avec un sélecteur d'accent par écurie.
 
+## 2026-10-30 — Fiche écurie
+
+- **Décision** : même gabarit que la fiche pilote, désormais partagé dans `components/profile/`
+  (`ProfileOpening`, `KeyFigures`, `ProfileLayout`, `ProfileSection`, `AsideBlock`/`AsideRow`).
+  Panneau couleur d'écurie avec le logo biseauté (initiale si pas de logo) ; chiffres : saisons,
+  pilotes engagés, première saison. Texte : Histoire (+ Héritage), Titulaires (vignettes de la
+  liste Pilotes), Pilotes de l'écurie (deux colonnes, 24 visibles puis dépliables), Saison par
+  saison (replié). Colonne latérale : Lignée, Team principals, Personnalités marquantes.
+- **Retiré** : cartes arrondies, filtres d'ère et pagination client du registre (remplacés par
+  le dépliage natif `<details>`), libellés mono en capitales.
+
 ## 2026-10-30 — Page Écuries
 
 - **Décision** : même structure que Pilotes (ouverture compacte, recherche, sections titrées).
