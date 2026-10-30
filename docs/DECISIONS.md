@@ -22,6 +22,17 @@
 - **Deuxième tour** : 4 ressentis sur l'accueil (Premium, Magazine, Outil, Cinématique) dans
   `public/directions.html`, avec un sélecteur d'accent par écurie.
 
+## 2026-10-30 — Page Écuries
+
+- **Décision** : même structure que Pilotes (ouverture compacte, recherche, sections titrées).
+  Plateau : une vignette biseautée par écurie, **fond à la couleur de l'écurie** (comme le
+  panneau de la fiche pilote), logo, nom, nom officiel et les deux titulaires avec leur numéro.
+  Historiques : **index alphabétique en colonnes**, drapeau + nom, sans pagination.
+- **Pourquoi l'index** : 203 écuries historiques sur 214 n'ont en base ni logo, ni couleur, ni
+  date de fondation ; des vignettes seraient vides et répétitives.
+- **Chiffres clés** : écuries depuis 1950, engagées cette saison, pays représentés (calculés).
+- **Données à corriger** : « Lotus-Pratt &amp; Whitney » stocké avec l'entité HTML.
+
 ## 2026-10-30 — Vignettes pilotes : chiffres au survol
 
 - **Demande de Dylan** : n'afficher Grands Prix / victoires / podiums qu'au survol de la vignette.
