@@ -19,6 +19,14 @@ const ISO2 = {
   QAT: 'QA', TUR: 'TR', LBN: 'LB', EGY: 'EG',
 }
 
+const COUNTRY_NAMES = new Intl.DisplayNames('fr', { type: 'region' })
+
+// Nom du pays en français (« NED » → « Pays-Bas ») ; le code brut si aucun ISO ne correspond
+export function countryName(code) {
+  const iso2 = ISO2[code]
+  return iso2 ? COUNTRY_NAMES.of(iso2) : code
+}
+
 // Nationalités disparues (Rhodésie, Yougoslavie...) sans code ISO actuel : pas de
 // drapeau possible, on retombe sur le drapeau à damier générique du site.
 export function Flag({ code, className }) {
