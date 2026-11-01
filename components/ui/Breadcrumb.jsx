@@ -9,14 +9,14 @@ export default function Breadcrumb({ items }) {
 
   return (
     <nav aria-label="Fil d'Ariane">
-      <ol className="flex flex-wrap items-center gap-2 font-mono text-xs uppercase tracking-wider text-[#8e8e8e]">
+      <ol className="flex flex-wrap items-center gap-2 text-sm text-[#8e8e8e]">
         {crumbs.map((crumb, index) => {
           const isCurrentPage = index === crumbs.length - 1
 
           return (
             <li key={crumb.label} className="flex items-center gap-2">
               {isCurrentPage ? (
-                <span aria-current="page" className="font-semibold text-white">
+                <span aria-current="page" className="text-text-secondary">
                   {crumb.label}
                 </span>
               ) : (
@@ -24,9 +24,7 @@ export default function Breadcrumb({ items }) {
                   <Link href={crumb.href} className="transition-colors hover:text-white">
                     {crumb.label}
                   </Link>
-                  <span aria-hidden="true" className="text-white/20">
-                    /
-                  </span>
+                  <span aria-hidden="true">/</span>
                 </>
               )}
             </li>

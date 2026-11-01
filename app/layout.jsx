@@ -1,10 +1,10 @@
-import { Geist, JetBrains_Mono } from 'next/font/google'
+import { JetBrains_Mono, Schibsted_Grotesk } from 'next/font/google'
 import './globals.css'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const schibstedGrotesk = Schibsted_Grotesk({
+  variable: '--font-schibsted',
   subsets: ['latin'],
 })
 
@@ -23,7 +23,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="fr" className={`dark ${geistSans.variable} ${jetbrainsMono.variable}`}>
+    <html lang="fr" className={`dark ${schibstedGrotesk.variable} ${jetbrainsMono.variable}`}>
       <body className="min-h-screen bg-background text-white antialiased flex flex-col">
         <Header />
         <main className="flex-1">{children}</main>

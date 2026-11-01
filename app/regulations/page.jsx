@@ -1,28 +1,8 @@
 import Breadcrumb from '@/components/ui/Breadcrumb'
 import { findEraForYear, getRegulationEras } from '@/lib/regulations'
 import { getSeasonYears } from '@/lib/seasons'
-import {
-  ERA_2026_CATEGORY,
-  ERA_2026_PILLARS,
-  FAQ_CATEGORY,
-  FAQ_ITEMS,
-  POINTS_CATEGORY,
-  POINTS_MAIN,
-  POINTS_SPRINT,
-  QUICK_METRICS,
-  RACE_FLAGS,
-  RACE_FLAGS_CATEGORY,
-  REGULATION_FILTERS,
-  REGULATION_PILLARS,
-} from '@/lib/content/regulations'
-import {
-  ERA_2026_SEARCH_INDEX,
-  FAQ_SEARCH_INDEX,
-  PILLAR_SEARCH_INDEXES,
-  POINTS_SEARCH_INDEX,
-  RACE_FLAGS_SEARCH_INDEX,
-  REGULATION_SEARCH_UNITS,
-} from '@/components/regulations/regulationsSearchIndex'
+import { getCurrentRulebook } from '@/lib/rulebook'
+import { buildRegulationSearchIndexes } from '@/components/regulations/regulationsSearchIndex'
 import RegulationsExplorer from '@/components/regulations/RegulationsExplorer'
 import SearchFilterBar from '@/components/regulations/SearchFilterBar'
 import FilterableSection from '@/components/regulations/FilterableSection'
@@ -38,12 +18,18 @@ import SeasonRegulationPanel from '@/components/regulations/SeasonRegulationPane
 export const metadata = {
   title: 'Règlements',
   description:
-    'Les règles sportives, techniques et financières de la Formule 1 en 2026, et ses grandes ères réglementaires.',
+    'Les règles sportives, techniques et financières de la Formule 1, et ses grandes ères réglementaires.',
 }
 
 export default async function RegulationsPage({ searchParams }) {
   const { season } = await searchParams
-  const [regulationEras, seasonYears] = await Promise.all([getRegulationEras(), getSeasonYears()])
+  const [regulationEras, seasonYears, rulebook] = await Promise.all([
+    getRegulationEras(),
+    getSeasonYears(),
+    getCurrentRulebook(),
+  ])
+  const { quickMetrics, filters, pillars, raceFlags, points, highlights, faq } = rulebook
+  const searchIndexes = buildRegulationSearchIndexes(rulebook)
   const currentYear = seasonYears[0]
   const requestedYear = Number(season)
   const selectedYear = seasonYears.includes(requestedYear) ? requestedYear : currentYear
@@ -64,7 +50,7 @@ export default async function RegulationsPage({ searchParams }) {
               </span>
               <span className="text-tertiary-container text-body-sm font-mono">•</span>
               <span className="font-mono text-telemetry-sm text-on-surface-variant uppercase">
-                SAISON 2026 · RÈGLEMENT EN VIGUEUR
+                SAISON {rulebook.year} · RÈGLEMENT EN VIGUEUR
               </span>
             </div>
             <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-space-md">
@@ -79,7 +65,7 @@ export default async function RegulationsPage({ searchParams }) {
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-space-sm bg-surface-container-low p-space-sm">
-                {QUICK_METRICS.map((metric) => (
+                {quickMetrics.map((metric) => (
                   <div
                     key={metric.label}
                     className="px-space-md py-space-xs bg-surface-container flex flex-col"
@@ -94,7 +80,7 @@ export default async function RegulationsPage({ searchParams }) {
                 ))}
               </div>
             </div>
-            <SearchFilterBar filters={REGULATION_FILTERS} units={REGULATION_SEARCH_UNITS} />
+            <SearchFilterBar filters={filters} units={searchIndexes.units} />
           </div>
         </section>
 
@@ -118,12 +104,12 @@ export default async function RegulationsPage({ searchParams }) {
               }
             />
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-gutter-desktop">
-              {REGULATION_PILLARS.map((pillar) => (
+              {pillars.map((pillar) => (
                 <FilterableSection
                   key={pillar.id}
                   as="article"
                   category={pillar.category}
-                  searchIndex={PILLAR_SEARCH_INDEXES[pillar.id]}
+                  searchIndex={searchIndexes.pillarIndexes[pillar.id]}
                   className="bg-surface-container-low flex flex-col p-space-lg hover:bg-surface-container transition-colors"
                 >
                   <PillarCard pillar={pillar} />
@@ -134,8 +120,8 @@ export default async function RegulationsPage({ searchParams }) {
 
           <FilterableSection
             as="section"
-            category={RACE_FLAGS_CATEGORY}
-            searchIndex={RACE_FLAGS_SEARCH_INDEX}
+            category={raceFlags.category}
+            searchIndex={searchIndexes.raceFlagsIndex}
             className="flex flex-col gap-space-md"
           >
             <RegulationsSectionHeader
@@ -148,7 +134,7 @@ export default async function RegulationsPage({ searchParams }) {
               }
             />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter-desktop">
-              {RACE_FLAGS.map((flag) => (
+              {raceFlags.flags.map((flag) => (
                 <RaceFlagCard key={flag.code} flag={flag} />
               ))}
             </div>
@@ -156,8 +142,8 @@ export default async function RegulationsPage({ searchParams }) {
 
           <FilterableSection
             as="section"
-            category={POINTS_CATEGORY}
-            searchIndex={POINTS_SEARCH_INDEX}
+            category={points.category}
+            searchIndex={searchIndexes.pointsIndex}
             className="flex flex-col gap-space-md"
           >
             <RegulationsSectionHeader
@@ -168,18 +154,18 @@ export default async function RegulationsPage({ searchParams }) {
                   <span className="material-symbols-outlined text-[16px] text-primary-container">
                     sports_score
                   </span>
-                  <span>SAISON 2026</span>
+                  <span>SAISON {rulebook.year}</span>
                 </div>
               }
             />
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter-desktop">
               <PointsTable
-                table={POINTS_MAIN}
+                table={points.main}
                 className="lg:col-span-7"
                 gridClassName="grid-cols-2 sm:grid-cols-5"
               />
               <PointsTable
-                table={POINTS_SPRINT}
+                table={points.sprint}
                 className="lg:col-span-5"
                 gridClassName="grid-cols-4"
               />
@@ -188,29 +174,26 @@ export default async function RegulationsPage({ searchParams }) {
 
           <FilterableSection
             as="section"
-            category={ERA_2026_CATEGORY}
-            searchIndex={ERA_2026_SEARCH_INDEX}
+            category={highlights.category}
+            searchIndex={searchIndexes.highlightsIndex}
             className="bg-surface-container-lowest p-space-lg lg:p-space-xl flex flex-col gap-space-lg relative overflow-hidden"
           >
             <div className="absolute -right-16 -bottom-16 w-64 h-64 bg-primary-container/5 rounded-full blur-3xl pointer-events-none" />
             <div className="relative z-10">
               <RegulationsSectionHeader
                 eyebrow="NOUVELLE ÈRE TECHNIQUE"
-                title="Règlement 2026 en Bref"
+                title={highlights.title}
                 aside={
                   <span className="shrink-0 self-start lg:self-auto px-space-md py-space-xs bg-surface-container text-on-surface font-mono text-telemetry-sm uppercase font-bold tracking-wider">
-                    EN VIGUEUR DEPUIS 2026
+                    {highlights.badge}
                   </span>
                 }
               >
-                <p className="font-sans text-body-md text-tertiary">
-                  La génération de monoplaces introduite en 2026 rééquilibre la puissance
-                  thermique/électrique et remplace le DRS par une aérodynamique active.
-                </p>
+                <p className="font-sans text-body-md text-tertiary">{highlights.intro}</p>
               </RegulationsSectionHeader>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter-desktop relative z-10">
-              {ERA_2026_PILLARS.map((pillar) => (
+              {highlights.pillars.map((pillar) => (
                 <Era2026Card key={pillar.title} pillar={pillar} />
               ))}
             </div>
@@ -218,15 +201,15 @@ export default async function RegulationsPage({ searchParams }) {
 
           <FilterableSection
             as="section"
-            category={FAQ_CATEGORY}
-            searchIndex={FAQ_SEARCH_INDEX}
+            category={faq.category}
+            searchIndex={searchIndexes.faqIndex}
             className="flex flex-col gap-space-md"
           >
             <RegulationsSectionHeader
               eyebrow="CLARIFICATIONS & FAQ"
               title="Règles Souvent Mal Comprises"
             />
-            <FaqAccordion items={FAQ_ITEMS} />
+            <FaqAccordion items={faq.items} />
           </FilterableSection>
 
           {regulationEras.length > 0 && (

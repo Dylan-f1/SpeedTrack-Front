@@ -4,13 +4,12 @@ import CircuitMetricCards from '@/components/circuits/CircuitMetricCards'
 import CircuitTrackMap from '@/components/circuits/CircuitTrackMap'
 import CircuitLayoutHistory from '@/components/circuits/CircuitLayoutHistory'
 import CircuitSpecsPending from '@/components/circuits/CircuitSpecsPending'
+import { apiFetch } from '@/lib/apiFetch'
 
 const HTTP_NOT_FOUND = 404
 
 async function getCircuit(slug) {
-  const res = await fetch(`${process.env.API_URL}/circuits/${slug}`, {
-    cache: 'no-store',
-  })
+  const res = await apiFetch(`/circuits/${slug}`)
   if (res.status === HTTP_NOT_FOUND) return null
   // Une autre erreur (quota de l'API dépassé, serveur indisponible) ne doit pas se
   // déguiser en « circuit introuvable » : on la laisse remonter à l'écran d'erreur

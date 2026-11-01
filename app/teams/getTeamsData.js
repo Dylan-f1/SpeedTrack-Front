@@ -1,10 +1,12 @@
+import { apiFetch } from '@/lib/apiFetch'
+
 const API_PAGE_LIMIT = 100
 // La liste des écuries et le plateau changent rarement (resynchronisation manuelle) : un
 // cache d'une heure évite de consommer le quota de l'API, partagé par tous les visiteurs
 const LIST_REVALIDATE_SECONDS = 3600
 
 async function fetchApi(path) {
-  const res = await fetch(`${process.env.API_URL}${path}`, {
+  const res = await apiFetch(path, {
     next: { revalidate: LIST_REVALIDATE_SECONDS },
   })
   if (!res.ok) throw new Error(`API error ${res.status} — ${path}`)
