@@ -1,14 +1,14 @@
 import Link from 'next/link'
-import Breadcrumb from '@/components/ui/Breadcrumb'
+import PageOpening from '@/components/ui/PageOpening'
 import SearchForm from '@/components/ui/SearchForm'
-import SectionHeader from '@/components/ui/SectionHeader'
-import CircuitsWorldMap from '@/components/circuits/CircuitsWorldMap'
+import CircuitIndex from '@/components/circuits/CircuitIndex'
+import CircuitsGlobe from '@/components/circuits/CircuitsGlobeLoader'
 import { normalizeSearchText } from '@/lib/utils'
 import { apiFetch } from '@/lib/apiFetch'
 
 export const metadata = {
   title: 'Circuits',
-  description: 'Les circuits de la Formule 1 depuis 1950, sur la carte du monde.',
+  description: 'Les circuits de la Formule 1 depuis 1950, sur un globe interactif.',
 }
 
 const API_PAGE_LIMIT = 100
@@ -31,6 +31,25 @@ function matchesSearch(circuit, normalizedSearch) {
   )
 }
 
+function plural(count, word) {
+  return `${count} ${word}${count > 1 ? 's' : ''}`
+}
+
+function CircuitsSection({ title, subtitle, children }) {
+  return (
+    <section className="pt-12">
+      <div className="mb-6 flex flex-wrap items-baseline gap-x-4 gap-y-1">
+        <h2 className="flex items-center gap-3 text-[clamp(26px,2.6vw,36px)] font-extrabold tracking-[-0.03em]">
+          <span aria-hidden="true" className="h-[3px] w-6 bg-red-primary" />
+          {title}
+        </h2>
+        {subtitle && <p className="text-[#8e8e8e]">{subtitle}</p>}
+      </div>
+      {children}
+    </section>
+  )
+}
+
 export default async function CircuitsPage({ searchParams }) {
   const { search } = await searchParams
   const activeSearch = search?.trim() ?? ''
@@ -39,68 +58,60 @@ export default async function CircuitsPage({ searchParams }) {
   const listedCircuits = activeSearch
     ? circuits.filter((circuit) => matchesSearch(circuit, normalizeSearchText(activeSearch)))
     : circuits
+  // Le globe ne peut placer que les circuits dont les coordonnées sont connues
+  const locatedCircuits = listedCircuits.filter(
+    ({ location }) => location?.lat != null && location?.lng != null
+  )
   const countryCount = new Set(circuits.map((circuit) => circuit.country)).size
+  const southernCount = circuits.filter(({ location }) => location?.lat < 0).length
 
   return (
-    <div className="max-w-7xl mx-auto px-6 sm:px-10 py-8 flex flex-col gap-10">
-      <Breadcrumb items={[{ label: 'Circuits' }]} />
+    <div className="pb-24">
+      <PageOpening
+        breadcrumb={[{ label: 'Circuits' }]}
+        title="Circuits"
+        lead="De Monaco à Suzuka, tous les tracés qui ont accueilli la Formule 1 depuis 1950."
+        keyFigures={[
+          { value: circuits.length, label: 'circuits depuis 1950' },
+          { value: countryCount, label: 'pays' },
+          { value: southernCount, label: "dans l'hémisphère sud" },
+        ]}
+      />
 
-      <header className="flex flex-col gap-3 pb-8 border-b border-white/[0.08]">
-        <div className="flex items-center gap-3">
-          <span className="h-5 w-1 bg-[#e10600] rounded-full" />
-          <span className="font-mono text-xs uppercase tracking-widest text-[#8e8e8e]">
-            Atlas des circuits
-          </span>
-        </div>
-        <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tight text-white">
-          Circuits
-        </h1>
-        <p className="text-sm text-[#8e8e8e] max-w-xl leading-relaxed">
-          De Monaco à Suzuka — les {circuits.length} tracés qui ont accueilli la Formule 1, dans{' '}
-          {countryCount} pays.
-        </p>
-      </header>
-
-      <section className="flex flex-col gap-6">
-        <SectionHeader
-          title={activeSearch ? 'Résultats' : 'Carte du monde'}
-          summary={
-            activeSearch
-              ? `${listedCircuits.length} circuit${listedCircuits.length > 1 ? 's' : ''} pour « ${activeSearch} »`
-              : `${circuits.length} circuits · ${countryCount} pays`
-          }
-        >
+      <div className="mx-auto max-w-[1400px] px-5 sm:px-8">
+        <div className="border-t border-border pt-6">
           <div className="w-full lg:w-80">
             <SearchForm
               action="/circuits"
               defaultValue={activeSearch}
-              placeholder="CIRCUIT, VILLE OU PAYS…"
+              placeholder="Circuit, ville ou pays"
               label="Rechercher un circuit par nom, ville ou pays"
             />
           </div>
-        </SectionHeader>
+        </div>
+
         {listedCircuits.length === 0 ? (
-          <div className="bg-[#131313] border border-[#262626] rounded-xl py-16 flex flex-col items-center gap-3 text-center">
-            <span
-              aria-hidden="true"
-              className="material-symbols-outlined text-[32px] text-[#5e5e5e]"
-            >
-              search_off
-            </span>
-            <p className="text-sm text-[#8e8e8e]">
-              Aucun circuit ne correspond à « {activeSearch} ».
-            </p>
-            <Link
-              href="/circuits"
-              className="font-mono text-xs text-[#e10600] hover:text-[#ff4d4d] transition-colors"
-            >
-              Réinitialiser la recherche
+          <div className="flex flex-col items-start gap-3 py-16">
+            <p className="text-xl font-bold">Aucun circuit ne correspond à « {activeSearch} ».</p>
+            <Link href="/circuits" className="hero-link">
+              Effacer la recherche
             </Link>
           </div>
         ) : (
-          <CircuitsWorldMap circuits={listedCircuits} />
+          <>
+            <CircuitsSection
+              title={activeSearch ? `Résultats pour « ${activeSearch} »` : 'Sur le globe'}
+              subtitle={plural(locatedCircuits.length, 'circuit')}
+            >
+              <CircuitsGlobe circuits={locatedCircuits} />
+            </CircuitsSection>
+
+            <CircuitsSection title="Par pays" subtitle={plural(listedCircuits.length, 'circuit')}>
+              <CircuitIndex circuits={listedCircuits} />
+            </CircuitsSection>
+          </>
         )}
-      </section>
+      </div>
     </div>
   )
 }
