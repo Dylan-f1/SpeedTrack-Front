@@ -22,6 +22,24 @@
 - **Deuxième tour** : 4 ressentis sur l'accueil (Premium, Magazine, Outil, Cinématique) dans
   `public/directions.html`, avec un sélecteur d'accent par écurie.
 
+## 2026-10-30 — Page Circuits : globe terrestre
+
+- **Demande de Dylan** : un globe terrestre zoomable (« on verra autre chose » ensuite).
+- **Fait** : globe SVG en projection orthographique avec `d3-geo` + `world-atlas` (déjà dans le
+  projet, aucune dépendance ajoutée). Glisser = rotation (latitude bornée à ±85°), molette =
+  zoom ×1 à ×8 (pincement à deux doigts sur écran tactile). Boutons + / − / « Recentrer »
+  retirés à la demande de Dylan : zoom à la souris uniquement. Clic sur un point : le globe tourne vers le
+  circuit (520 ms, ease-out, saut direct si mouvement réduit) et le panneau à droite affiche
+  pays, nom, coordonnées et le lien vers la fiche. Pays hôtes un ton plus clair. Index par pays
+  sous le globe (accès clavier et lecteur d'écran).
+- **Rendu côté navigateur seulement** (`CircuitsGlobeLoader`, `ssr: false`) : les tracés calculés
+  par Node différaient au dernier chiffre de ceux de Chrome, d'où une erreur d'hydratation.
+- **Mobile** : `touch-action: pan-y` pour que le défilement vertical de la page reste possible ;
+  glisser horizontalement fait tourner, pincer zoome. Points et étiquettes dimensionnés
+  en pixels réels (8 px, zone de clic 22 px).
+- **Point d'attention** : sur ordinateur, la molette au-dessus du globe zoome au lieu de faire
+  défiler la page.
+
 ## 2026-10-30 — Fiche écurie
 
 - **Décision** : même gabarit que la fiche pilote, désormais partagé dans `components/profile/`

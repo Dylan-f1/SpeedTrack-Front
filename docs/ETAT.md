@@ -34,8 +34,11 @@ refaire l'identité visuelle du site en gardant les textes et les données.
   des données), restylage de « Dernière manche » et « Classement » (masqués tant qu'il n'y a pas
   de résultats), diaporama du hero (attend des images), pied de page.
 - Accueil commité (`607e307`, `af22829`, docs `ab4ae7b`), non poussé.
-- Fiche écurie refaite (non commitée, en attente du retour de Dylan) sur le gabarit commun des
-  fiches (`components/profile/`).
+- Page Circuits refaite (non commitée, en attente du retour de Dylan) : globe terrestre
+  zoomable (`CircuitsGlobe`, d3-geo) + index par pays. La suite (« on verra autre chose ») est à
+  définir avec Dylan.
+- Fiche écurie refaite (commit `f0a317f`) sur le gabarit commun des fiches
+  (`components/profile/`).
 - Page Écuries refaite (commit `8f3113b`) : vignettes couleur d'écurie pour le plateau, index
   A–Z pour les 203 historiques.
 - Fiche pilote refaite (commit `9b52b2d`) : ouverture en écran partagé
